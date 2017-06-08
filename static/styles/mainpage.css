@@ -3,96 +3,79 @@ body {
     font-family: sans-serif;
     padding: 0;
     margin: 0;
-
+    padding-bottom: 6em;
 }
 
-
-#maintable {
-    
-    width:100%;
-    height:100vh;
-    table-layout:fixed;
-
-
+a {
+    text-decoration: none;
 }
 
-.textarea {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    resize: none;
-    outline: none;
+#problembody {
+    padding: 1em 2em;
+    max-width: 50em;
+    margin: auto;
+    margin-top: 3em;
 }
 
-#editor {
-
-    width:100%;
-    height: 100%;
-
+nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 100;
 }
 
-#runstop {
+nav table {
     width: 100%;
-    margin-bottom: 1em;
+    padding: 1em 2em;
+    background-color: rgba(224,224,224,1.0);
+}
+
+.home {
+    text-align: left;
+}
+.brand {
     text-align: center;
 }
-
-#statustext {
-    color: rgba(0,0,0,0.8);
-    font-size: 0.9em;
-    text-align: center;
-
+.login {
+    text-align: right;
 }
 
-#leftpanel {
-    padding: 1em;
+table.samples {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
-#rightpanel {
-
-    width: 16em;
-    padding: 2em;
-    height: 100%;
-
+.sampleterminal {
+    font-family: monospace;
+    background-color: rgba(0,0,0,0.1);
+    padding: 1em 0.5em;
+    border-radius: 0.5em;
+    border-style: solid;
+    border-color: rgba(0,0,0,0.4);
+    border-width: 1px;
+}
+table.samples td {
+    padding: 0.2em;
 }
 
-#output {
-    white-space: pre-wrap;
-}
 
-.button {
-
-    width: 5em;
+#submitbutton {
+    width: 5.1em;
     height: 2.3em;
     text-decoration: none;
     display: inline-block;
     border-radius: 0.3em;
     border: none;
-    font-size: 1em;
+    font-size: 1.15em;
     font-weight: 500;
     cursor: pointer;
     outline: none;
-
-}
-
-#runbutton {
-
-    background-color: rgba(10,170,60,0.8);
-
+    background-color: rgba(59,187,99,1.0);
     color: white;
+    position: fixed;
+    right: 2em;
+    top: 4.5em;
 }
-
-#stopbutton:active {
-    color: black;
-}
-
-.io {
-
-    width: 100%;
-    border: solid 1px #000;
-    padding: 0.2em;
-    font-family: monospace;
-    font-size: 1em;
-}
-
-

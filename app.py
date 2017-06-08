@@ -2,6 +2,7 @@
 import random, os, sys, binascii
 import subprocess
 import sqlite3
+from hashlib import md5
 
 from flask import *
 app = Flask(__name__)
@@ -17,21 +18,10 @@ def rlpt(pt):
 app.config["DATABASE"] = rlpt("app.db")
 
 def connect_db():
-    rv = sqlite3.connect(app.config['DATABASE'])
+    # use detect_types for easy datetime
+    rv = sqlite3.connect(app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES)
     rv.row_factory = sqlite3.Row
     return rv
-
-# init database
-def init_db():
-    db = get_db()
-    with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.commit()
-@app.cli.command('initdb')
-def initdb_command():
-    """Initializes the database."""
-    init_db()
-    print('Initialized the database.')
 
 # get database
 def get_db():
@@ -49,8 +39,50 @@ def close_db(error):
 
 
 
+# Log in
+
+def get_user():
+    if not logged_in():
+        return {}
+    db = get_db()
+    cur = db.execute("SELECT * FROM users WHERE userid = '" + user_id() + "'")
+    user = cur.fetchone()
+    return user
+
+
+def user_id():
+    if not logged_in():
+        return ""
+    return session["userid"]
+
+def logged_in():
+    return "userid" in session
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        passwordhash = str(md5(request.form["password"]))
+        db = get_db()
+        cur = db.execute("SELECT * FROM users WHERE username = '" + username + "' AND passwordhash = '" + passwordhash + "'")
+        if len(cur.fetchall()) == 0:
+            return render_template("login.html", failedattempt = True)
+        user = cur.fetchone()
+        session["userid"] = user["userid"]
+        return redirect(url_for('home'))
+    return render_template("login.html", failedattempt = False)
+
+@app.route("/logout")
+def logout():
+    session.pop("userid")
+    return redirect(url_for('home'))
+
+
+
+
+
 @app.route("/")
-def main():
+def home():
     #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
     return render_template("home.html")
@@ -58,13 +90,40 @@ def main():
 @app.route("/problem", methods=["GET"])
 def loadproblem():
     problemid = request.args["id"]
-    statementspath = rlpt("problems/" + problemid + "/statement.txt")
+    statementspath = rlpt("problems/" + problemid + "/statement.html")
     if os.path.exists(statementspath):
         # load problem statement, and submissions history
-        problemstatement = ""
+        problemstatement = "hej"
         with open(statementspath) as statementfile:
             problemstatement = statementfile.read()
+        # get all sample test cases
+        sampleinfilenames = []
+        sampleoutfilenames = set()
+        for testfile in os.listdir(rlpt("problems/" + problemid + "/testdata")):
+            if testfile.startswith("sample"):
+                if testfile.endswith(".in"):
+                    sampleinfilenames.append(testfile)
+                elif testfile.endswith(".out"):
+                    sampleoutfilenames.add(testfile)
+        samples = []
+        for samplein in sampleinfilenames:
+            sampleout = samplein[:-2] + "out"
+            if (sampleout in sampleoutfilenames):
+                sampledict = {}
+                with open(rlpt("problems/" + problemid + "/testdata/" + samplein)) as sampleinfile:
+                    sampledict["in"] = sampleinfile.read()
+                with open(rlpt("problems/" + problemid + "/testdata/" + sampleout)) as sampleoutfile:
+                    sampledict["out"] = sampleoutfile.read()
+                samples.append(sampledict)
         # check if logged in
+        submissions = {}
+        if logged_in():
+            # get submission id, date, status
+            db = get_db()
+            cur = db.execute("SELECT userid, problemid, submissionid, submissiontext, submissiondate FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+            submissions = cur.fetchall()
+        print(problemstatement)
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=json.dumps(submissions), samples=samples)
     else:
         abort(404)
 
