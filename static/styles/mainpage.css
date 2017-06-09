@@ -29,6 +29,7 @@ nav table {
     width: 100%;
     padding: 1em 2em;
     background-color: rgba(224,224,224,1.0);
+    table-layout: fixed;
 }
 
 .home {
@@ -38,6 +39,9 @@ nav table {
     text-align: center;
 }
 .login {
+    text-align: right;
+}
+.loggedin {
     text-align: right;
 }
 
@@ -78,4 +82,27 @@ table.samples td {
     position: fixed;
     right: 2em;
     top: 4.5em;
+}
+
+#loginformcontainer {
+    width: 20em;
+    margin: auto;
+    padding: 1em;
+    background-color: rgba(0,0,0,0.1);
+}
+
+#loginform label {
+    padding: 1em;
+}
+#submitrow {
+    text-align: center;
+    padding-top: 1em;
+}
+#faillabel {
+    text-align: center;
+    width: 100%;
+}
+#signuplabel {
+    text-align: center;
+    width: 100%;
 }
