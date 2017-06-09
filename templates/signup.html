@@ -53,11 +53,15 @@
 
 
         <div id="loginformcontainer">
-            {% if failedattempt %}
 
-            <label id="faillabel">Username already taken!</label>
+            <div id="infoarea">
+                {% if failedattempt %}
 
-            {% endif %}
+                <label id="faillabel">Username already taken!</label>
+
+                {% endif %}
+            </div>
+
             <form id="loginform" method="post">
                 <table>
                     <tr>

@@ -52,11 +52,19 @@
 
 
         <div id="loginformcontainer">
-            {% if failedattempt %}
+            <div id="infoarea">
+                    {% if failedattempt %}
 
-            <label id="faillabel">Wrong username or password!</label>
+                <label id="faillabel">Wrong username or password!</label>
 
-            {% endif %}
+                {% endif %}
+                {% if signupsuccess %}
+                <label id="infolabel">Signup successful!</label>
+                {% endif %}
+                {% if loginfirstmessage %}
+                <label id="infolabel">You need to log in first.</label>
+                {% endif %}
+            </div>
             <form id="loginform" method="post">
                 <table>
                     <tr>
@@ -74,8 +82,10 @@
 
 
             </form>
-
-            <a id="signuplabel" href="{{ url_for('signup') }}">New user? Sign up.</a>
+            
+            <div id="signuparea">
+                <a id="signuplabel" href="{{ url_for('signup') }}">New user? Sign up.</a>
+            </div>
 
         </div>
 

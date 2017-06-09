@@ -89,6 +89,7 @@ def login():
     loginfirstmessage = False
     if "g" in request.args:
         loginfirstmessage = True
+        signupsuccess = False
     return render_template("login.html", failedattempt = False, signupsuccess = signupsuccess, loginfirstmessage = loginfirstmessage)
 
 @app.route("/logout")

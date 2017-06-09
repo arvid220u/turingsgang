@@ -90,9 +90,21 @@ table.samples td {
     padding: 1em;
     background-color: rgba(0,0,0,0.1);
 }
+#faillabel {
+    color: red;
+}
+#signuparea {
+    text-align: center;
+}
+#infoarea {
+    text-align: center;
+}
 
 #loginform label {
     padding: 1em;
+}
+#loginform {
+    padding: 1em 0;
 }
 #submitrow {
     text-align: center;
