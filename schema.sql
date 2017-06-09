@@ -12,5 +12,5 @@ create table submissions (
     submissiondate timestamp,
     problemid text not null,
     submissiontext text,
-    submissionstatus integer
+    submissionstatus text
 );
