@@ -225,6 +225,7 @@ def problem():
                     sampleinfilenames.append(testfile)
                 elif testfile.endswith(".out"):
                     sampleoutfilenames.add(testfile)
+        sampleinfilenames.sort()
         samples = []
         for samplein in sampleinfilenames:
             sampleout = samplein[:-2] + "out"
