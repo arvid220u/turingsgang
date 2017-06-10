@@ -43,7 +43,7 @@
 
         <h1>Submission</h1>
         
-        <table id="submissioninfo">
+        <table id="submissioninfo" class="realtable">
             <tr class="tableheader">
                 <td>Date</td>
                 <td>User</td>
@@ -55,7 +55,7 @@
                 <td>{{ submissiondate.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 <td>{{ submissionusername }}</td>
                 <td><a href="{{ url_for('problem', id=problemid) }}">{{ problemtitle }}</a></td>
-                <td>{{ submissionstatus }}</td>
+                <td class="submissionstatus {{ submissionstatus }}">{{ submissionstatus }}</td>
                 <td class="submissiontime">{{ executiontime }}</td>
             </tr>
         </table>

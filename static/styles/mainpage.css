@@ -1,21 +1,27 @@
 body {
 
-    font-family: "Open Sans", sans-serif;
+    /*font-family: "Open Sans", sans-serif;*/
+    font-family: sans-serif;
     padding: 0;
     margin: 0;
-    padding-bottom: 6em;
+    padding-bottom: 4em;
     line-height: 180%;
 }
 
+
 a {
     text-decoration: none;
+    color: rgba(59,99,187,1.0);
+}
+a:visited {
+    color: rgba(59,99,187,1.0);
 }
 
 #problembody {
     padding: 1em 2em;
     max-width: 50em;
     margin: auto;
-    margin-top: 3em;
+    margin-top: 3.5em;
 }
 
 nav {
@@ -26,11 +32,19 @@ nav {
     z-index: 100;
     line-height: 100%;
 }
+nav a {
+    font-weight: 600;
+    color: rgba(255,255,255,1.0);
+}
+nav a:visited {
+    color: rgba(255,255,255,1.0);
+}
 
 nav table {
     width: 100%;
     padding: 1em 2em;
-    background-color: rgba(224,224,224,1.0);
+    background-color: rgba(11,100,62,1.0);
+    color: white;
     table-layout: fixed;
 }
 
@@ -82,11 +96,13 @@ table.samples td {
     font-weight: 500;
     cursor: pointer;
     outline: none;
-    background-color: rgba(59,187,99,1.0);
+    /*background-color: rgba(59,187,99,1.0);
+    background-color: rgba(11,100,62,1.0);*/
+    background-color: rgba(61,187,71,1.0);
     color: white;
     position: fixed;
     right: 2em;
-    top: 4.5em;
+    top: 5em;
 }
 #submitbuttonid {
     width: 5.1em;
@@ -99,7 +115,9 @@ table.samples td {
     font-weight: 500;
     cursor: pointer;
     outline: none;
-    background-color: rgba(59,187,99,1.0);
+    /*background-color: rgba(59,187,99,1.0);
+    background-color: rgba(11,100,62,1.0);*/
+    background-color: rgba(61,187,71,1.0);
     color: white;
     margin-top: 1em;
 }
@@ -147,7 +165,7 @@ table.samples td {
     min-width: 70vw;
     max-width: 50em;
     margin: auto;
-    margin-top: 3em;
+    margin-top: 3.5em;
     text-align: center;
 }
 #problembodysubmission {
@@ -155,7 +173,7 @@ table.samples td {
     min-width: 70vw;
     max-width: 50em;
     margin: auto;
-    margin-top: 3em;
+    margin-top: 3.5em;
 }
 #problembodysubmission h1 {
     text-align: center;
@@ -163,7 +181,7 @@ table.samples td {
 }
 #submissioninfo {
     width: 100%;
-    padding: 1em 0 2em 0;
+    margin: 1em 0 2em 0;
 }
 .tableheader {
     font-weight: bold;
@@ -184,13 +202,22 @@ table.samples td {
     border-radius: 0.5em;
     border-width: 1px;
     min-height: 20em;
-    line-height: 120%;
+    line-height: 150%;
 }
 
 
 .submissions {
     margin: auto;
     width: 100%;
+}
+.realtable, .realtable td {
+    border-width: 1px;
+    border-color: rgba(231,231,232,1.0);
+    border-style: solid;
+    border-collapse: collapse;
+}
+.realtable td {
+    padding: 0.2em 0.5em;
 }
 .submissionstitle {
     padding-top: 1em;
@@ -213,4 +240,22 @@ table.samples td {
     border-style: solid;
     border-width: 1px;
     border-radius: 4px;
+}
+
+.submissionstatus {
+    font-weight: 700;
+}
+.Accepted {
+    color: rgba(61,187,71,1.0);
+}
+.Wrong.Answer, .Time.Limit.Exceeded, .Runtime.Error, .Compile.Error {
+    color: rgba(239,17,29,1.0);
+}
+.Running {
+    color: rgba(137, 137, 146, 1.0);
+}
+
+
+#problemtable {
+    width: 100%;
 }

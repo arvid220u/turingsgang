@@ -82,7 +82,7 @@
             <p>No submissions. Make your first one!</p>
         {% else %}
 
-            <table class="submissions">
+            <table class="realtable submissions">
                 <tr class="tableheader">
                     <td>Date</td>
                     <td>Full submission</td>
@@ -94,7 +94,7 @@
                 <tr>
                     <td class="submissiondate">{{ submission["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td class="submissionlink"><a href="{{ submission['submissionlink'] }}">View submission</a></td>
-                    <td class="submissionstatus">{{ submission["submissionstatus"] }}</td>
+                    <td class="submissionstatus {{ submission['submissionstatus'] }}">{{ submission["submissionstatus"] }}</td>
                     <td class="submissiontime">{{ submission["executiontime"] }}</td>
                 </tr>
                 
