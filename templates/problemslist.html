@@ -41,7 +41,7 @@
                 <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
                 <td class="brand"><b>BorgarJudge</b></td>
                 {% if logged_in %}
-                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url) }}">Logout</a></td>
+                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url, _external=True, _scheme='https') }}">Logout</a></td>
                 {% else %}
                     <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https') }}">Login</a></td>
                 {% endif %}
@@ -50,6 +50,22 @@
     </nav>
 
 
+    <div id="problembody">
+
+        <h1>Problems</h1>
+
+        <table id="problemtable">
+            <tr class="tableheader">
+                <td>Problem</td>
+            </tr>
+            {% for problem in problems %}
+            <tr>
+                <td><a href="{{ url_for('problem', id=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
 
 
 
