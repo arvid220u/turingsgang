@@ -12,5 +12,6 @@ create table submissions (
     submissiondate timestamp,
     problemid text not null,
     submissiontext text,
-    submissionstatus text
+    submissionstatus text,
+    executiontime text
 );
