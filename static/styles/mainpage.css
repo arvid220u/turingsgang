@@ -118,3 +118,35 @@ table.samples td {
     text-align: center;
     width: 100%;
 }
+
+
+
+#problembodysubmit {
+    padding: 1em 2em;
+    min-width: 70vw;
+    width: 70em;
+    max-width: 90vw;
+    margin: auto;
+    margin-top: 3em;
+    text-align: center;
+}
+#editor {
+    max-width: 80vw;
+    min-width: 70vw;
+    height: 50vh;
+    margin: auto;
+    border-radius: 0.5em;
+    border-width: 1px;
+    min-height: 20em;
+}
+
+
+
+.submissions {
+    table-layout: fixed;
+    margin: auto;
+    width: 100%;
+}
+.submissionsheaderrow {
+    font-weight: bold;
+}

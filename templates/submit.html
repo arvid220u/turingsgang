@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Judge</title>
+ 
+ 
+    <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                processEscapes: true
+            }
+        });
+    </script>
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+ 
+</head>
+ 
+<body>
+
+    <script>
+
+        // global variables
+            
+
+        
+        function submitbutton() {
+            var cppfile = editor.getSession().getValue();
+            if (cppfile == "") {
+                return;
+            }
+            document.getElementById("submissioninput").value = cppfile;
+            document.getElementById("submitform").submit();
+        }
+
+
+    </script>
+
+    <nav>
+        <table>
+            <tr>
+                <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
+                <td class="brand"><b>BorgarJudge</b></td>
+                {% if logged_in %}
+                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout') }}">Logout</a></td>
+                {% else %}
+                    <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https') }}">Login</a></td>
+                {% endif %}
+            </tr>
+        </table>
+    </nav>
+
+    <div id="problembodysubmit">
+
+
+        <h1>Submit a Solution on {{ problemtitle }}</h1>
+
+        <div id="editor"></div>
+
+        <script src="{{ url_for('static',filename='ace-builds/src-noconflict/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+        <script>
+            var editor = ace.edit("editor");
+            editor.setShowPrintMargin(false);
+            editor.setTheme("ace/theme/textmate");
+            editor.getSession().setMode("ace/mode/c_cpp");
+        </script>
+
+        <form id="submitform" action="{{ url_for('submit') }}" method="POST">
+            <input type="text" style="display:none" name="problem" value="{{ problemid }}"></input>
+            <textarea id="submissioninput" style="display:none" name="submission"></textarea>
+            <button type="button" onclick="submitbutton()" id="submitbuttonid">Submit</button>
+        </form>
+
+
+    </div>
+
+
+
+ 
+</body>
+ 
+</html>
