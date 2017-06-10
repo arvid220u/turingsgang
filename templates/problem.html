@@ -94,7 +94,7 @@
             {% for submission in submissions %}
                     
                 <tr>
-                    <td class="submissiondate">{{ submission["submissionsdate"].strftime('%Y-%m-%d %H-%M-%S') }}</td>
+                    <td class="submissiondate">{{ submission["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td class="submissionstatus">{{ submission["submissionstatus"] }}</td>
                     <td class="submissionlink"><a href="{{ submission['submissionlink'] }}">View submission</a></td>
                 </tr>
