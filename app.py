@@ -368,6 +368,16 @@ def gettimelimit(problemid):
         pass
     return timelimit
 
+import resource
+def setgradelimits():
+    # set memory limit to 1024 MB = 2**30
+    resource.setrlimit(resource.RLIMIT_AS, (2**30,2**30))
+    os.system("unshare(CLONE_NEWNET)")
+    os.chroot("grading/tmp/")
+    os.setgid(305)
+    os.setuid(305)
+
+
 def grade(problemid, submissionid, submissiontext):
 
     # create the filename
@@ -416,7 +426,7 @@ def grade(problemid, submissionid, submissiontext):
                 try:
                     with open(rlpt("problems/" + problemid + "/testdata/" + testin), "rb") as infile:
                         starttime = time.time()
-                        output = subprocess.check_output([os.path.abspath(exfilename)], stdin=infile, timeout=timelimit).decode("utf-8")
+                        output = subprocess.check_output([os.path.abspath(exfilename)], stdin=infile, timeout=timelimit, preexec_fn = setgradelimits).decode("utf-8")
                         endtime = time.time()
                         realexecutiontime = endtime - starttime
                         executiontime = max(realexecutiontime, executiontime)
