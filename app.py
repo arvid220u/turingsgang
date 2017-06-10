@@ -4,6 +4,7 @@ import subprocess
 import sqlite3
 from hashlib import md5
 from base64 import b64encode
+from datetime import datetime
 
 from flask import *
 app = Flask(__name__)
@@ -40,7 +41,25 @@ def close_db(error):
 
 
 
+# redis queues
+app.config['REDIS_QUEUE_KEY'] = 'submissionsqueue'
+from redis import Redis
+redis = Redis()
 
+separator = "%%%%%%%%%%%%%%arvidlunnemarkisdabestevercoolestguywowowow%%%%%%%%%%%%%%"
+def submissionsdaemon():
+    while 1:
+        msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
+        datastring = msg[1].decode("utf-8")
+        datalist = datastring.split(separator)
+        problemid = datalist[0]
+        submissionid = datalist[1]
+        submissiontext = datalist[2]
+        grade(problemid, submissionid, submissiontext)
+
+def delaygradesubmission(problemid, submissionid, submissiontext):
+    datastring = problemid + separator + submissionid + separator + submissiontext
+    redis.rpush(current_app.config['REDIS_QUEUE_KEY'], datastring)
 
 
 
@@ -58,6 +77,11 @@ def get_user():
         abort(404)
     return user[0]
 
+def get_username():
+    username = ""
+    if logged_in():
+        username = get_user()["username"]
+    return username
 
 def user_id():
     if not logged_in():
@@ -141,10 +165,7 @@ def signup():
 def home():
     #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
-    username = ""
-    if logged_in():
-        username = get_user()["username"]
-    return render_template("home.html", logged_in=logged_in(), username=username)
+    return render_template("home.html", logged_in=logged_in(), username=get_username())
 
 @app.route("/problem", methods=["GET"])
 def loadproblem():
@@ -179,14 +200,14 @@ def loadproblem():
         if logged_in():
             # get submission id, date, status
             db = get_db()
-            cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+            cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate DESC")
             for submission in cur.fetchall():
-                submission["submissionlink"] = url_for("submission", id=submission["submissionid"], _external=True, _scheme="https")
-                submissions.append(submission)
-        username = ""
-        if logged_in():
-            username = get_user()["username"]
-        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=username)
+                realsubmission = {}
+                realsubmission["submissionlink"] = url_for("submission", id=submission["submissionid"], _external=True, _scheme="https")
+                realsubmission["submissionstatus"] = submission["submissionstatus"]
+                realsubmission["submissiondate"] = submission["submissiondate"]
+                submissions.append(realsubmission)
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username())
     else:
         abort(404)
 
@@ -195,103 +216,146 @@ def loadproblem():
 
 @app.route("/submission", methods=["GET"])
 def submission():
-    return render_template("submission.html")
+    #return render_template("submission.html")
+    return getsubmissionstatus(request.args["id"])
 
 
-@app.route("/submit", methods=["GET"])
+@app.route("/submissionstatus", methods=["POST"])
+def submissionstatus():
+    submissionid = request.args["submissionid"]
+    return getsubmissionstatus(submissionid)
+
+def getsubmissionstatus(submissionid):
+    db = get_db()
+    cur = db.execute("SELECT submissionstatus FROM submissions WHERE submissionid = '" + submissionid + "'")
+    results = cur.fetchall()
+    if len(results) == 0:
+        return "No Submission"
+    return results[0]["submissionstatus"]
+
+
+@app.route("/submit", methods=["GET", "POST"])
 def submit():
     if not logged_in():
         return redirect(url_for('login', g="true",  _external=True, _scheme="https"))
-    return render_template("submit.html")
+
+
+    if request.method == "POST":
+        problemid = request.form["problem"]
+        submissiontext = request.form["submission"]
+        print(problemid)
+        print(submissiontext)
+
+        db = get_db()
+
+        # create a random submission id
+        submissionid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+        submissionidcur = db.execute("SELECT COUNT(1) from submissions WHERE submissionid ='" + submissionid + "'")
+        while submissionidcur.fetchone()[0] != 0:
+            submissionid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+            submissionidcur = db.execute("SELECT COUNT(1) from submissions WHERE submissionid ='" + submissionid + "'")
+
+        # create a database entry for this submission, and add the submission to the submission queue
+        db.execute("INSERT into submissions (submissionid, userid, submissiondate, problemid, submissiontext, submissionstatus) values (?, ?, ?, ?, ?, ?)", (submissionid, user_id(), datetime.now(), problemid, submissiontext, 'Running'))
+        db.commit()
+
+        # compile and run this submission
+        #grade.delay(problemid, submissionid, submissiontext)
+        #hej.delay()
+        delaygradesubmission(problemid, submissionid, submissiontext)
+        return redirect(url_for("submission", id=submissionid, _external=True, _scheme="https"))
+
+
+    problemid = request.args["problem"]
+    problemtitlepath = rlpt("problems/" + problemid + "/title.txt")
+    if os.path.exists(problemtitlepath):
+        problemtitle = ""
+        with open(problemtitlepath) as problemtitlefile:
+            problemtitle = problemtitlefile.read()
+        return render_template("submit.html", problemid = problemid, problemtitle = problemtitle, logged_in = logged_in(), username = get_username())
+    else:
+        abort(404)
 
 
 
+def grade(problemid, submissionid, submissiontext):
 
-"""
-@app.route("/file", methods=["GET"])
-def loadfile():
-    filecontents = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n    \n    \n    return 0;\n}"
-    fileid = request.args["id"]
-    if os.path.exists("data/" + fileid + ".cpp"):
-        with open("data/" + fileid + ".cpp", "r") as savedfile:
-            filecontents = savedfile.read()
-    return render_template("index.html", fileid=fileid, filecontents=json.dumps(filecontents))
-"""
-
-"""
-@app.route("/savefile", methods=["POST"])
-def savefile():
-    # get data from post
-    indata = request.data.decode("utf-8")
-    fileid, cpp = indata.split("%%%arvidlunnemarkwowcool%%%")
-    
     # create the filename
-    filename = "data/" + fileid + ".cpp"
-    # write to the file
-    with open(filename, "w") as cppfile:
-        cppfile.write(cpp)
-
-    return "successfully saved"
-"""
-
-
-
-
-
-@app.route("/compileandrun", methods=["POST"])
-def compileandrun():
-
-    # get data from post
-    indata = request.data.decode("utf-8")
-    fileid, cpp, inputdata = indata.split("%%%arvidlunnemarkwowcool%%%")
-
-    # create the filename
-    filename = "data/" + fileid + ".cpp"
+    filename = "grading/" + submissionid + ".cpp"
     exfilename = filename + ".x"
-    infilename = filename + ".in"
-    compiledfilename = filename + ".compiled"
     # write to the file
     with open(filename, "w") as cppfile:
-        cppfile.write(cpp)
+        cppfile.write(submissiontext)
 
-    # create the infile
-    with open(infilename, "w") as infile:
-        infile.write(inputdata)
 
-    # check if compiled file is different
-    compileddifferent = True
-    if os.path.exists(compiledfilename):
-        with open(compiledfilename, "r") as compiledfile:
-            if compiledfile.read() == cpp:
-                compileddifferent = False
+    status = ""
+
     # compile the file to the exfile
-    if compileddifferent:
-        try:
-            subprocess.call(["g++", "-std=c++11", "-fsanitize=address,undefined", "-o", exfilename, filename])
-        except Exception as exception:
-            os.remove(infilename)
-            return "A compile error occurred."
-        if not os.path.exists(exfilename):
-            os.remove(infilename)
-            return "A compile error occurred."
-        # write to the compile file
-        with open(compiledfilename, "w") as cppfile:
-            cppfile.write(cpp)
-
-    # get the output
-    output = ""
     try:
-        with open(infilename, "rb") as infile:
-            output = subprocess.check_output([os.path.abspath(exfilename)], stdin=infile, timeout=10).decode("utf-8")
+        subprocess.call(["g++", "-std=c++11", "-fsanitize=address,undefined", "-O2", "-o", exfilename, filename])
     except Exception as exception:
-        os.remove(infilename)
-        return "A runtime error occurred."
+        status = "Compile Error"
+    if not os.path.exists(exfilename):
+        status = "Compile Error"
 
+    
+    if status == "":
+
+        timelimit = 1
+        timelimitpath = rlpt("problems/" + problemid + "/timelimit.txt")
+        try:
+            with open(timelimitpath, "r") as timelimitfile:
+                timelimit = int(timelimitfile.read())
+        except Exception as exception:
+            pass
+
+        tests = []
+        testinfilenames = []
+        testoutfilenames = set()
+        for testfile in os.listdir(rlpt("problems/" + problemid + "/testdata")):
+            if testfile.endswith(".in"):
+                testinfilenames.append(testfile)
+            elif testfile.endswith(".out"):
+                testoutfilenames.add(testfile)
+        for testin in testinfilenames:
+            testout = testin[:-2] + "out"
+            if (testout in testoutfilenames):
+                realoutput = ""
+                with open(rlpt("problems/" + problemid + "/testdata/" + testout), "r") as testoutfile:
+                    realoutput = testoutfile.read()
+                # get the output
+                output = ""
+                shouldbreak = False
+                try:
+                    with open(rlpt("problems/" + problemid + "/testdata/" + testin), "rb") as infile:
+                        output = subprocess.check_output([os.path.abspath(exfilename)], stdin=infile, timeout=timelimit).decode("utf-8")
+                except subprocess.TimeoutExpired as expiredexception:
+                    status = "Time Limit Exceeded"
+                    shouldbreak = True
+                except Exception as exception:
+                    status = "Runtime Error"
+                    shouldbreak = True
+                if shouldbreak: break
+                if output != realoutput:
+                    status = "Wrong Answer"
+                    break
+
+    if status == "":
+        status = "Accepted"
     # remove temporary files
-    os.remove(infilename)
+    os.remove(filename)
+    try:
+        os.remove(exfilename)
+    except OSError:
+        pass
 
-    # return the output
-    return output
+    # write to the sqlite database
+    db = connect_db()
+    db.execute("UPDATE submissions SET submissionstatus = '" + status + "' WHERE submissionid = '" + submissionid + "'")
+    db.commit()
+
+    # return the status
+    return status
 
 
 if __name__ == "__main__":
