@@ -65,6 +65,14 @@
                 <label id="infolabel">You need to log in first.</label>
                 {% endif %}
             </div>
+
+            <script>
+                
+                var current_url = window.location.href;
+                document.getElementById("loginform").action = current_url;
+
+            </script>
+
             <form id="loginform" method="post">
                 <table>
                     <tr>
@@ -84,7 +92,11 @@
             </form>
             
             <div id="signuparea">
-                <a id="signuplabel" href="{{ url_for('signup') }}">New user? Sign up.</a>
+                {% if urlfrom == "nourlfrom" %}
+                    <a id="signuplabel" href="{{ url_for('signup') }}">New user? Sign up.</a>
+                {% else %}
+                    <a id="signuplabel" href="{{ url_for('signup', loginfrom=urlfrom) }}">New user? Sign up.</a>
+                {% endif %}
             </div>
 
         </div>

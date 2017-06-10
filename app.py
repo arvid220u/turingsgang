@@ -74,7 +74,7 @@ def get_user():
     user = cur.fetchall()
     if len(user) == 0:
         logout()
-        abort(404)
+        return abort(404)
     return user[0]
 
 def get_username():
@@ -106,6 +106,8 @@ def login():
             return render_template("login.html", failedattempt = True)
         user = curlist[0]
         session["userid"] = user["userid"]
+        if "urlfrom" in request.args:
+            return redirect(httpsify(request.args["urlfrom"]))
         return redirect(url_for('home', _external=True, _scheme="https"))
     signupsuccess = False
     if "s" in request.args:
@@ -114,12 +116,23 @@ def login():
     if "g" in request.args:
         loginfirstmessage = True
         signupsuccess = False
-    return render_template("login.html", failedattempt = False, signupsuccess = signupsuccess, loginfirstmessage = loginfirstmessage)
+    if "urlfrom" in request.args:
+        return render_template("login.html", failedattempt = False, signupsuccess = signupsuccess, loginfirstmessage = loginfirstmessage, urlfrom = request.args["urlfrom"])
+    else:
+        return render_template("login.html", failedattempt = False, signupsuccess = signupsuccess, loginfirstmessage = loginfirstmessage, urlfrom = "nourlfrom")
 
-@app.route("/logout")
+
+def httpsify(url):
+    if url.startswith("http://"):
+        return url.replace("http://", "https://", 1)
+    return url
+
+@app.route("/logout", methods=["GET"])
 def logout():
     if logged_in():
         session.pop("userid")
+    if "from" in request.args:
+        return redirect(httpsify(request.args["from"]))
     return redirect(url_for('home', _external=True, _scheme="https"))
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -152,8 +165,11 @@ def signup():
         db.execute("INSERT into users (username, userid, passwordhash, email) values ('" + username + "', '" + userid + "', '" + passwordhash + "', '" + email + "')")
 
         db.commit()
-
+        
+        if "loginfrom" in request.args:
+            return redirect(url_for('login', s = "true", urlfrom=request.args["loginfrom"], _scheme="https", _external=True))
         return redirect(url_for('login', s = "true", _scheme="https", _external=True))
+
     return render_template("signup.html", failedattempt = False)
 
 
@@ -209,7 +225,7 @@ def loadproblem():
                 submissions.append(realsubmission)
         return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username())
     else:
-        abort(404)
+        return abort(404)
 
 
 
@@ -217,7 +233,15 @@ def loadproblem():
 @app.route("/submission", methods=["GET"])
 def submission():
     #return render_template("submission.html")
-    return getsubmissionstatus(request.args["id"])
+    #return getsubmissionstatus(request.args["id"])
+    # make the page static. i need to do imo asap
+    db = get_db()
+    cur = db.execute("SELECT * FROM submissions WHERE submissionid = '" + submissionid + "'")
+    results = cur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+
+
 
 
 @app.route("/submissionstatus", methods=["POST"])
@@ -274,7 +298,7 @@ def submit():
             problemtitle = problemtitlefile.read()
         return render_template("submit.html", problemid = problemid, problemtitle = problemtitle, logged_in = logged_in(), username = get_username())
     else:
-        abort(404)
+        return abort(404)
 
 
 

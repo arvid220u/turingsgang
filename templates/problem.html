@@ -42,9 +42,9 @@
                 <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
                 <td class="brand"><b>BorgarJudge</b></td>
                 {% if logged_in %}
-                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout') }}">Logout</a></td>
+                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url) }}">Logout</a></td>
                 {% else %}
-                    <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https') }}">Login</a></td>
+                    <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}">Login</a></td>
                 {% endif %}
             </tr>
         </table>
