@@ -6,6 +6,7 @@
  
  
     <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Merriweather|Open+Sans" rel="stylesheet">
 
     <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
 
@@ -63,17 +64,13 @@
         {% for sample in samples %}
 
             <tr class="samplerow">
-                <td class="sampleinput">
+                <td class="sampleinput" valign="top">
                     <h3 class="inputoutputtitle sampleinput">Sample Input {{ loop.index }}</h3>
-                    <div class="sampleterminal">
-                        {{ sample["in"] | safe }}
-                    </div>
+                    <div class="sampleterminal">{{ sample["in"] | safe }}</div>
                 </td>
-                <td class="sampleoutput">
+                <td class="sampleoutput" valign="top">
                     <h3 class="inputoutputtitle sampleoutput">Sample Output {{ loop.index }}</h3>
-                    <div class="sampleterminal">
-                        {{ sample["out"] | safe }}
-                    </div>
+                    <div class="sampleterminal">{{ sample["out"] | safe }}</div>
                 </td>
             </tr>
         {% endfor %}
