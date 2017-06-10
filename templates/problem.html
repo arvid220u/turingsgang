@@ -104,6 +104,9 @@
 
         {% endif %}
 
+
+        <hr id="problemcreditsseparator">
+        <p class="problemcredits">{{ problemcredits | safe }}</p>
     </div>
 
     <form action="{{ url_for('submit') }}">

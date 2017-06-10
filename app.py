@@ -210,6 +210,12 @@ def problem():
         problemstatement = "hej"
         with open(statementspath) as statementfile:
             problemstatement = statementfile.read()
+        problemcredits = ""
+        try:
+            with open(rlpt("problems/" + problemid + "/credits.html")) as creditsfile:
+                problemcredits = creditsfile.read()
+        except Exception as exception:
+            pass
         # get all sample test cases
         sampleinfilenames = []
         sampleoutfilenames = set()
@@ -242,7 +248,7 @@ def problem():
                 realsubmission["submissiondate"] = submission["submissiondate"]
                 realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], problemid)
                 submissions.append(realsubmission)
-        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username())
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits)
     else:
         return abort(404)
 
