@@ -5,6 +5,7 @@ import sqlite3
 from hashlib import md5
 from base64 import b64encode
 from datetime import datetime
+import time
 
 from flask import *
 app = Flask(__name__)
@@ -48,14 +49,18 @@ redis = Redis()
 
 separator = "%%%%%%%%%%%%%%arvidlunnemarkisdabestevercoolestguywowowow%%%%%%%%%%%%%%"
 def submissionsdaemon():
-    while 1:
-        msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
-        datastring = msg[1].decode("utf-8")
-        datalist = datastring.split(separator)
-        problemid = datalist[0]
-        submissionid = datalist[1]
-        submissiontext = datalist[2]
-        grade(problemid, submissionid, submissiontext)
+    while True:
+        try:
+            while 1:
+                msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
+                datastring = msg[1].decode("utf-8")
+                datalist = datastring.split(separator)
+                problemid = datalist[0]
+                submissionid = datalist[1]
+                submissiontext = datalist[2]
+                grade(problemid, submissionid, submissiontext)
+        except Exception as exception:
+            continue
 
 def delaygradesubmission(problemid, submissionid, submissiontext):
     datastring = problemid + separator + submissionid + separator + submissiontext
@@ -66,21 +71,25 @@ def delaygradesubmission(problemid, submissionid, submissiontext):
 
 # Log in
 
-def get_user():
-    if not logged_in():
-        return {}
+def get_user(userid = None):
+    if userid == None:
+        userid = user_id()
+        if not logged_in():
+            return {}
     db = get_db()
-    cur = db.execute("SELECT * FROM users WHERE userid = '" + user_id() + "'")
+    cur = db.execute("SELECT * FROM users WHERE userid = '" + userid + "'")
     user = cur.fetchall()
     if len(user) == 0:
         logout()
         return abort(404)
     return user[0]
 
-def get_username():
-    username = ""
-    if logged_in():
-        username = get_user()["username"]
+
+def get_username(userid = None):
+    if userid == None:
+        userid = user_id()
+        if not logged_in(): return ""
+    username = get_user(userid = userid)["username"]
     return username
 
 def user_id():
@@ -181,10 +190,19 @@ def signup():
 def home():
     #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
-    return render_template("home.html", logged_in=logged_in(), username=get_username())
+    # list all problems
+    problemids = os.listdir(rlpt("problems"))
+    problems = []
+    for problemid in problemids:
+        problem = {}
+        problem["problemid"] = problemid
+        problem["problemtitle"] = getproblemtitle(problemid)
+        problems.append(problem)
+
+    return render_template("problemslist.html", logged_in=logged_in(), username=get_username(), problems = problems)
 
 @app.route("/problem", methods=["GET"])
-def loadproblem():
+def problem():
     problemid = request.args["id"]
     statementspath = rlpt("problems/" + problemid + "/statement.html")
     if os.path.exists(statementspath):
@@ -222,24 +240,62 @@ def loadproblem():
                 realsubmission["submissionlink"] = url_for("submission", id=submission["submissionid"], _external=True, _scheme="https")
                 realsubmission["submissionstatus"] = submission["submissionstatus"]
                 realsubmission["submissiondate"] = submission["submissiondate"]
+                realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], problemid)
                 submissions.append(realsubmission)
         return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username())
     else:
         return abort(404)
 
 
-
+import html
 
 @app.route("/submission", methods=["GET"])
 def submission():
     #return render_template("submission.html")
     #return getsubmissionstatus(request.args["id"])
     # make the page static. i need to do imo asap
+    submissionid = request.args["id"]
     db = get_db()
     cur = db.execute("SELECT * FROM submissions WHERE submissionid = '" + submissionid + "'")
     results = cur.fetchall()
     if len(results) == 0:
         return abort(404)
+
+    result = results[0]
+
+
+    problemid = result["problemid"]
+    problemtitle = getproblemtitle(problemid)
+
+    executiontime = getrealexecutiontime(result["executiontime"], result["submissionstatus"], problemid)
+    
+    return render_template("submission.html", problemid=problemid, problemtitle = problemtitle, submissionusername=get_username(userid = result["userid"]), submissiondate=result["submissiondate"], submissiontext=html.escape(result["submissiontext"]), submissionstatus=result["submissionstatus"], logged_in=logged_in(), username = get_username(), executiontime = executiontime)
+
+
+
+def getproblemtitle(problemid):
+    problemtitlepath = rlpt("problems/" + problemid + "/title.txt")
+    problemtitle = problemid
+    with open(problemtitlepath) as problemtitlefile:
+        problemtitle = problemtitlefile.read()
+    return problemtitle
+
+def getrealexecutiontime(extime, status, problemid):
+    inttime = float(extime)
+    if status == "Compile Error":
+        return "-"
+    if status == "Time Limit Exceeded":
+        timelimit = gettimelimit(problemid)
+        timstring = "{:.2f}".format(timelimit) 
+        realstring = ">" + timstring + " s"
+        return realstring
+    if inttime == -1:
+        return "?"
+    timstring = "{:.2f}".format(inttime) 
+    timstring = timstring + " s"
+    return timstring
+
+
 
 
 
@@ -280,7 +336,7 @@ def submit():
             submissionidcur = db.execute("SELECT COUNT(1) from submissions WHERE submissionid ='" + submissionid + "'")
 
         # create a database entry for this submission, and add the submission to the submission queue
-        db.execute("INSERT into submissions (submissionid, userid, submissiondate, problemid, submissiontext, submissionstatus) values (?, ?, ?, ?, ?, ?)", (submissionid, user_id(), datetime.now(), problemid, submissiontext, 'Running'))
+        db.execute("INSERT into submissions (submissionid, userid, submissiondate, problemid, submissiontext, submissionstatus, executiontime) values (?, ?, ?, ?, ?, ?, ?)", (submissionid, user_id(), datetime.now(), problemid, submissiontext, 'Running', -1))
         db.commit()
 
         # compile and run this submission
@@ -302,6 +358,16 @@ def submit():
 
 
 
+def gettimelimit(problemid):
+    timelimit = 1
+    timelimitpath = rlpt("problems/" + problemid + "/timelimit.txt")
+    try:
+        with open(timelimitpath, "r") as timelimitfile:
+            timelimit = float(timelimitfile.read())
+    except Exception as exception:
+        pass
+    return timelimit
+
 def grade(problemid, submissionid, submissiontext):
 
     # create the filename
@@ -316,22 +382,19 @@ def grade(problemid, submissionid, submissiontext):
 
     # compile the file to the exfile
     try:
-        subprocess.call(["g++", "-std=c++11", "-fsanitize=address,undefined", "-O2", "-o", exfilename, filename])
+        subprocess.call(["g++", "-std=c++11", "-O2", "-o", exfilename, filename])
     except Exception as exception:
         status = "Compile Error"
     if not os.path.exists(exfilename):
         status = "Compile Error"
 
+    executiontime = -1
     
     if status == "":
 
-        timelimit = 1
-        timelimitpath = rlpt("problems/" + problemid + "/timelimit.txt")
-        try:
-            with open(timelimitpath, "r") as timelimitfile:
-                timelimit = int(timelimitfile.read())
-        except Exception as exception:
-            pass
+        executiontime = 0
+
+        timelimit = gettimelimit(problemid)
 
         tests = []
         testinfilenames = []
@@ -352,10 +415,15 @@ def grade(problemid, submissionid, submissiontext):
                 shouldbreak = False
                 try:
                     with open(rlpt("problems/" + problemid + "/testdata/" + testin), "rb") as infile:
+                        starttime = time.time()
                         output = subprocess.check_output([os.path.abspath(exfilename)], stdin=infile, timeout=timelimit).decode("utf-8")
+                        endtime = time.time()
+                        realexecutiontime = endtime - starttime
+                        executiontime = max(realexecutiontime, executiontime)
                 except subprocess.TimeoutExpired as expiredexception:
                     status = "Time Limit Exceeded"
                     shouldbreak = True
+                    executiontime = -1
                 except Exception as exception:
                     status = "Runtime Error"
                     shouldbreak = True
@@ -375,7 +443,7 @@ def grade(problemid, submissionid, submissiontext):
 
     # write to the sqlite database
     db = connect_db()
-    db.execute("UPDATE submissions SET submissionstatus = '" + status + "' WHERE submissionid = '" + submissionid + "'")
+    db.execute("UPDATE submissions SET submissionstatus = '" + status + "', executiontime = '" + str(executiontime) + "' WHERE submissionid = '" + submissionid + "'")
     db.commit()
 
     # return the status

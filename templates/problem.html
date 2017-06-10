@@ -42,7 +42,7 @@
                 <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
                 <td class="brand"><b>BorgarJudge</b></td>
                 {% if logged_in %}
-                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url) }}">Logout</a></td>
+                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url, _external=True, _scheme='https') }}">Logout</a></td>
                 {% else %}
                     <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}">Login</a></td>
                 {% endif %}
@@ -86,17 +86,19 @@
         {% else %}
 
             <table class="submissions">
-                <tr class="submissionsheaderrow">
+                <tr class="tableheader">
                     <td>Date</td>
-                    <td>Status</td>
                     <td>Full submission</td>
+                    <td>Status</td>
+                    <td>CPU</td>
                 </tr>
             {% for submission in submissions %}
                     
                 <tr>
                     <td class="submissiondate">{{ submission["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    <td class="submissionstatus">{{ submission["submissionstatus"] }}</td>
                     <td class="submissionlink"><a href="{{ submission['submissionlink'] }}">View submission</a></td>
+                    <td class="submissionstatus">{{ submission["submissionstatus"] }}</td>
+                    <td class="submissiontime">{{ submission["executiontime"] }}</td>
                 </tr>
                 
             {% endfor %}
