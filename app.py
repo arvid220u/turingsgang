@@ -372,10 +372,6 @@ import resource
 def setgradelimits():
     # set memory limit to 1024 MB = 2**30
     resource.setrlimit(resource.RLIMIT_AS, (2**30,2**30))
-    os.system("unshare(CLONE_NEWNET)")
-    os.chroot("grading/tmp/")
-    os.setgid(305)
-    os.setuid(305)
 
 
 def grade(problemid, submissionid, submissiontext):
