@@ -21,7 +21,7 @@ a:visited {
     padding: 1em 2em;
     max-width: 50em;
     margin: auto;
-    margin-top: 3.5em;
+    margin-top: 3.8em;
 }
 
 nav {
@@ -165,7 +165,7 @@ table.samples td {
     min-width: 70vw;
     max-width: 50em;
     margin: auto;
-    margin-top: 3.5em;
+    margin-top: 3.8em;
     text-align: center;
 }
 #problembodysubmission {
@@ -173,7 +173,7 @@ table.samples td {
     min-width: 70vw;
     max-width: 50em;
     margin: auto;
-    margin-top: 3.5em;
+    margin-top: 3.8em;
 }
 #problembodysubmission h1 {
     text-align: center;
@@ -181,7 +181,7 @@ table.samples td {
 }
 #submissioninfo {
     width: 100%;
-    margin: 1em 0 2em 0;
+    margin: 2em 0;
 }
 .tableheader {
     font-weight: bold;
