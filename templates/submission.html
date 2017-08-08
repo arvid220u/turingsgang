@@ -54,7 +54,7 @@
             <tr id="submissioninfodetails">
                 <td>{{ submissiondate.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 <td>{{ submissionusername }}</td>
-                <td><a href="{{ url_for('problem', id=problemid) }}">{{ problemtitle }}</a></td>
+                <td><a href="{{ url_for('problem', problemid=problemid) }}">{{ problemtitle }}</a></td>
                 <td class="submissionstatus {{ submissionstatus }}">{{ submissionstatus }}</td>
                 <td class="submissiontime">{{ executiontime }}</td>
             </tr>

@@ -190,26 +190,87 @@ def signup():
 def home():
     #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
+    return problemslist()
+
+
+def problemslist():
     # list all problems
     problemids = os.listdir(rlpt("problems"))
     problems = []
     for problemid in problemids:
+        if problemid.startswith("%"):
+            continue
         problem = {}
         problem["problemid"] = problemid
         problem["problemtitle"] = getproblemtitle(problemid)
+        problem["status"] = "Not Attempted"
+        if logged_in():
+            # get submission id, date, status
+            db = get_db()
+            cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+            for submission in cur.fetchall():
+                if problem["status"] != "Accepted":
+                    problem["status"] = submission["submissionstatus"]
         problems.append(problem)
 
     return render_template("problemslist.html", logged_in=logged_in(), username=get_username(), problems = problems)
 
-@app.route("/problem", methods=["GET"])
-def problem():
-    problemid = request.args["id"]
+
+def addextradatatoproblemstatement(problemstatement, problemid):
+    # all extra data is identified by being enclosed in %al% tags
+    # thus, all elements on even indices are raw html code,
+    # while all odd elements constitute some type of extra data
+    problemstatementsplit = problemstatement.split("%al%")
+
+    realproblemstatement = ""
+
+    for index, data in enumerate(problemstatementsplit):
+        # if index is even, just continue
+        if index % 2 == 0:
+            realproblemstatement += data
+            continue
+
+        # strip for whitespace in identifier part
+        data.lstrip()
+
+        if data.startswith("image"):
+            # images are identified by %al%image:filename.png%al%
+            filenamestring = data.split(":")[1].strip()
+            # add an img tag. add an extra class that is this problems id concatenated with the filename (without extension), for custom styling
+            realproblemstatement += "<img class='problemstatementimage " + problemid + filenamestring.split('.')[0].split(' ')[0] + "' src='" + url_for('static', filename='problems/' + problemid + "/" + filenamestring) + "'>"
+
+        elif data.startswith("problemlink"):
+            # problemlink has format problemlink:problemid
+            problemidstring = data.split(":")[1].strip()
+            realproblemstatement += url_for("problem", problemid=problemidstring)
+
+        elif data.startswith("problemtitle"):
+            # formt problemlink:problemtitle
+            problemidstring = data.split(":")[1].strip()
+            realproblemstatement += getproblemtitle(problemidstring)
+
+
+
+    return realproblemstatement
+
+        
+
+
+
+
+
+@app.route("/problems/<problemid>", methods=["GET"])
+def problem(problemid):
     statementspath = rlpt("problems/" + problemid + "/statement.html")
     if os.path.exists(statementspath):
         # load problem statement, and submissions history
         problemstatement = "hej"
         with open(statementspath) as statementfile:
             problemstatement = statementfile.read()
+
+        # maybe add images to the problem statement
+        problemstatement = addextradatatoproblemstatement(problemstatement, problemid)
+
         problemcredits = ""
         try:
             with open(rlpt("problems/" + problemid + "/credits.html")) as creditsfile:
@@ -249,7 +310,7 @@ def problem():
                 realsubmission["submissiondate"] = submission["submissiondate"]
                 realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], problemid)
                 submissions.append(realsubmission)
-        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits)
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits, problemtitle=getproblemtitle(problemid))
     else:
         return abort(404)
 
@@ -365,6 +426,17 @@ def submit():
 
 
 
+
+@app.route("/submissionshistory", methods=["GET"])
+def submissionshistory():
+    if not logged_in():
+        return abort(404)
+    if get_username() != "Teodor Bucht" and get_username() != "arvid220u":
+        return abort(404)
+    return "you are privileged to view submissions history"
+
+
+
 def gettimelimit(problemid):
     timelimit = 1
     timelimitpath = rlpt("problems/" + problemid + "/timelimit.txt")
@@ -395,7 +467,7 @@ def grade(problemid, submissionid, submissiontext):
 
     # compile the file to the exfile
     try:
-        subprocess.call(["g++", "-std=c++11", "-O2", "-o", exfilename, filename])
+        subprocess.call(["g++", "-std=c++11", "-static", "-O2", "-o", exfilename, filename])
     except Exception as exception:
         status = "Compile Error"
     if not os.path.exists(exfilename):
@@ -441,7 +513,8 @@ def grade(problemid, submissionid, submissiontext):
                     status = "Runtime Error"
                     shouldbreak = True
                 if shouldbreak: break
-                if output != realoutput:
+                # rstrip so that users don't have to end with newlines
+                if output.rstrip() != realoutput.rstrip():
                     status = "Wrong Answer"
                     break
 

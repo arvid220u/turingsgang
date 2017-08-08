@@ -55,13 +55,13 @@
 
         <h1>Problems</h1>
 
-        <table class="realtable" id="problemtable">
+        <table class="realtable problemtable">
             <tr class="tableheader">
                 <td>Problem</td>
             </tr>
             {% for problem in problems %}
             <tr>
-                <td><a href="{{ url_for('problem', id=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+                <td class="{{ problem['status'] }}"><a href="{{ url_for('problem', problemid=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
             </tr>
             {% endfor %}
         </table>
