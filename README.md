@@ -7,7 +7,7 @@ Use a `virtualenv`.
 
 Use with Nginx in production. See https://blog.marksteve.com/deploy-a-flask-application-inside-a-digitalocean-droplet/.
 
-SSL is good. Read https://certbot.eff.org.
+SSL is good. Read https://certbot.eff.org. Use the following cron job for automatic renewal: `43 1,13 * * * certbot renew --post-hook "service nginx reload"` (after running `crontab -e`).
 
 ### Requirements
 
