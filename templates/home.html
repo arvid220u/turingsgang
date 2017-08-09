@@ -2,7 +2,7 @@
 <html lang="en">
  
 <head>
-    <title>Judge</title>
+    <title>Turings gäng</title>
  
  
     <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
@@ -40,7 +40,7 @@
         <table>
             <tr>
                 <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
-                <td class="brand"><b>BorgarJudge</b></td>
+                <td class="brand"><b>Turings gäng;</b></td>
                 {% if logged_in %}
                     <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout', from=request.url) }}">Logout</a></td>
                 {% else %}
