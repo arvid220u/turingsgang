@@ -1,6 +1,11 @@
-MIT License
+Modified MIT License
 
 Copyright (c) 2017 Arvid Lunnemark
+
+Note: This license applies to all files except for the files in the
+'problems' directory. Each problem is separately licensed, and that
+license information is present in the 'credits.html' file of each problem
+folder.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
