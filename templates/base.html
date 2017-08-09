@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>{% block title %}{% endblock %}</title>
+ 
+ 
+    <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Merriweather|Open+Sans" rel="stylesheet">
+
+    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                processEscapes: true
+            }
+        });
+    </script>
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    {% block head %}{% endblock %}
+
+ 
+</head>
+ 
+<body>
+    <nav>
+        <table>
+            <tr>
+                <td class="leftnavlink {% block nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
+                <td class="leftnavlink {% block nav_feed %}{% endblock %}"><a href="{{ url_for('feed') }}">Flöde</a></td>
+                <td class="leftnavlink {% block nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Alla problem</a></td>
+                <td class="leftnavlink {% block nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
+                <td class="brand"><a href="{{ url_for('home') }}"><span class="turing">Turings</span> <span class="gang">gäng</span><span class ="semicolon">;</span></a></td>
+                {% if logged_in %}
+                    <td class="loggedin"><span id="loggedinmessage">Inloggad som {{ username }}.</span> <a href="{{ url_for('logout', from=request.url, _external=True, _scheme='https') }}">Logga ut</a></td>
+                {% else %}
+                    <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}">Logga in</a></td>
+                {% endif %}
+            </tr>
+        </table>
+    </nav>
+
+
+
+    {% block body %}{% endblock %}
+
+
+ 
+</body>
+ 
+</html>
