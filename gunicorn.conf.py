@@ -1,3 +1,3 @@
-daemon = True
-accesslog = "logs/access.log"
-errorlog = "logs/error.log"
+#daemon = True
+#accesslog = "logs/access.log"
+#errorlog = "logs/error.log"
