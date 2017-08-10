@@ -1,55 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
- 
-<head>
-    <title>Judge</title>
- 
- 
-    <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Merriweather|Open+Sans" rel="stylesheet">
-    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+{% extends "base.html" %}
+{% block title %}Logga in - Turings gäng{% endblock %}
 
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [['$','$'], ['\\(','\\)']],
-                processEscapes: true
-            }
-        });
-    </script>
-    <script type="text/javascript" async
-      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
-
- 
-</head>
- 
-<body>
-
-    <script>
-
-        // global variables
-            
-
-
-
-    </script>
-
-    <nav>
-        <table>
-            <tr>
-                <td class="home"><a href="{{ url_for('home') }}">Home</a></td>
-                <td class="brand"><b>BorgarJudge</b></td>
-                {% if logged_in %}
-                    <td class="loggedin"><span id="loggedinmessage">Logged in as {{ username }}.</span> <a href="{{ url_for('logout') }}">Logout</a></td>
-                {% else %}
-                    <td class="login"><a href="{{ url_for('login', _external=True, _scheme='https') }}">Login</a></td>
-                {% endif %}
-            </tr>
-        </table>
-    </nav>
-
-    <div id="problembody">
+{% block body %}
+<div id="problembody">
 
 
         <div id="loginformcontainer">
@@ -107,7 +60,4 @@
 
 
 
- 
-</body>
- 
-</html>
+{% endblock %} 

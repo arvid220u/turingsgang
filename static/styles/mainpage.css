@@ -1,7 +1,7 @@
 body {
 
-    /*font-family: "Open Sans", sans-serif;*/
-    font-family: sans-serif;
+    background-color: rgb(240,240,240);
+    font-family: "Open Sans", sans-serif;
     padding: 0;
     margin: 0;
     padding-bottom: 4em;
@@ -19,12 +19,105 @@ a:visited {
 }
 
 #problembody {
+    font-family: Merriweather, serif;
     padding: 1em 2em;
     max-width: 50em;
     margin: auto;
-    margin-top: 3.8em;
+    margin-top: 1em;
+    background-color: rgb(255,255,255);
+    padding-bottom: 2em;
+}
+#problemtitle {
+    font-size: 2.5em;
+    text-align: center;
+    padding-bottom: 0em;
+    margin-bottom: 0.5em;
 }
 
+
+
+nav {
+    width: 100%;
+    font-weight: 700;
+    font-family: Inconsolata, Monaco, Menlo, monospace;
+    /*background-color: rgb(253,246,227);*/
+    background-color: rgb(255,255,255);
+    color: rgb(101,123,131);
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    font-size: 1.2em;
+}
+#navigationtable {
+    width: 100%;
+    table-layout: fixed;
+    height: 3.3em;
+}
+.centernavigationtablerow {
+    text-align: center;
+    vertical-align: center;
+    max-width: 99%;
+    margin: 0;
+    padding: 0;
+    height: auto;
+}
+.loginrow {
+    text-align: right;
+    width: 10em;
+    padding: 0.5em 0;
+    padding-right: 1.5em;
+    line-height: 100%;
+}
+.loginrow a.loginlink {
+    color: rgb(101,123,131);
+}
+.loginrow a.logoutlink {
+    color: rgb(220,50,47);
+    font-size: 0.8em;
+    margin-top: 0em;
+    padding-top: 0;
+}
+#loggedinmessage {
+    color: rgb(181,137,0);
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+#loginbr {
+    display: block;
+    font-size: 0.3em;
+}
+.brandrow {
+    text-align: left;
+    width: 10em;
+    padding: 0.5em 0;
+    padding-left: 1.5em;
+    font-weight: 700;
+}
+.brandrow .turing {
+    color: rgb(224, 83, 24);
+}
+.brandrow .gang {
+    color: rgb(7, 158, 163);
+}
+.brandrow .semicolon {
+    color: rgb(70, 87, 92);
+}
+#centernavigationtable {
+    table-layout: fixed;
+    margin: 0 auto;
+}
+.leftnavlink {
+    width: 10em;
+}
+.leftnavlink a {
+    color: rgb(101,123,131);
+}
+.navbaractive a {
+    color: rgb(181, 137, 0);
+}
+
+
+
+/*
 nav {
     position: fixed;
     left: 0;
@@ -34,6 +127,7 @@ nav {
     line-height: 100%;
 }
 nav a {
+    color: rgb(7, 158, 163);
     font-weight: 600;
     color: rgba(255,255,255,1.0);
 }
@@ -60,7 +154,14 @@ nav table {
 }
 .loggedin {
     text-align: right;
-}
+}*/
+
+
+
+
+
+
+
 
 table.samples {
     width: 100%;
@@ -88,23 +189,24 @@ table.samples td {
 
 
 #submitbutton {
-    width: 5.1em;
-    height: 2.3em;
+    width: 6em;
+    height: 2.2em;
     text-decoration: none;
-    display: inline-block;
     border-radius: 0.3em;
     border: none;
-    font-size: 1.15em;
-    font-weight: 500;
+    font-size: 1em;
     cursor: pointer;
     outline: none;
     /*background-color: rgba(59,187,99,1.0);
     background-color: rgba(11,100,62,1.0);*/
     background-color: rgba(61,187,71,1.0);
     color: white;
-    position: fixed;
-    right: 2em;
-    top: 5em;
+    text-align: center;
+    margin: 0.3em 0;
+}
+
+#submitcolumn {
+    vertical-align: top;
 }
 #submitbuttonid {
     width: 5.1em;
@@ -129,7 +231,8 @@ table.samples td {
     max-width: 80vw;
     margin: auto;
     padding: 1em;
-    background-color: rgba(0,0,0,0.1);
+    /*background-color: rgba(0,0,0,0.1);*/
+    font-family: "Open Sans", sans-serif;
 }
 #faillabel {
     color: red;
@@ -175,15 +278,20 @@ table.samples td {
     min-width: 70vw;
     max-width: 50em;
     margin: auto;
-    margin-top: 3.8em;
+    margin-top: 1em;
+    font-family: Merriweather, serif;
+    background-color: rgb(255,255,255);
 }
-#problembodysubmission h1 {
+h1 {
     text-align: center;
     width: 100%;
+    margin-bottom: 1em;
+    margin-top: 1em;
 }
 #submissioninfo {
     width: 100%;
     margin: 2em 0;
+    font-family: "Open Sans", sans-serif;
 }
 .tableheader {
     font-weight: bold;
@@ -211,6 +319,7 @@ table.samples td {
 .submissions {
     margin: auto;
     width: 100%;
+    font-family: "Open Sans", sans-serif;
 }
 .realtable, .realtable td {
     border-width: 1px;
@@ -235,9 +344,29 @@ table.samples td {
     font-size: 0.9em;
     width: 100%;
     text-align: center;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    font-family: "Open Sans", sans-serif;
 }
 #problemcreditsseparator {
-    margin-top: 4em;
+    margin-top: 3em;
+    border-color: rgba(0,0,0,0.1);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 4px;
+}
+#problemtimelimit {
+    text-align: center;
+    font-size: 0.9em;
+    font-family: "Open Sans", sans-serif;
+    color: rgb(147,161,161);
+    margin: 0.5em 0;
+}
+#problemheader {
+    text-align: center;
+}
+#problemheaderseparator {
+    margin-top: 1em;
     border-color: rgba(0,0,0,0.1);
     border-style: solid;
     border-width: 1px;
@@ -258,8 +387,16 @@ table.samples td {
 }
 
 
+
+
+
+
+
+
+
 .problemtable {
     width: 100%;
+    font-family: "Open Sans", sans-serif;
 }
 
 table.problemtable  tr  td.Accepted {

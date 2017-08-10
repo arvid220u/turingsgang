@@ -192,7 +192,7 @@ def home():
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
     return problemslist()
 
-
+@app.route("/problems")
 def problemslist():
     # list all problems
     problemids = os.listdir(rlpt("problems"))
@@ -437,6 +437,9 @@ def submissionshistory():
 
 
 
+
+# GRADING
+
 def gettimelimit(problemid):
     timelimit = 1
     timelimitpath = rlpt("problems/" + problemid + "/timelimit.txt")
@@ -451,6 +454,8 @@ import resource
 def setgradelimits():
     # set memory limit to 1024 MB = 2**30
     resource.setrlimit(resource.RLIMIT_AS, (2**30,2**30))
+
+
 
 
 def grade(problemid, submissionid, submissiontext):
@@ -534,6 +539,30 @@ def grade(problemid, submissionid, submissiontext):
 
     # return the status
     return status
+
+
+
+# EDITOR
+
+@app.route("/editor")
+def editor():
+    return "this is da editor"
+
+
+
+# FEED
+
+@app.route("/flode")
+def feed():
+    return "this is da feed"
+
+
+
+# ABOUT
+
+@app.route("/om")
+def about():
+    return "this is da om page"
 
 
 if __name__ == "__main__":
