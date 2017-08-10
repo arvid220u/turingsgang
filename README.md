@@ -1,7 +1,7 @@
 # turingsgang
 An online judge for competitive programming.
 
-### Setup
+## Setup
 
 Use a `virtualenv`.
 
@@ -11,9 +11,17 @@ SSL is good. Read https://certbot.eff.org. Use the following cron job for automa
 
 Run the app with the command `gunicorn app:app`.
 
+### Server
+
+Nginx is used.
+
+The nginx config file used is located at `/etc/nginx/conf.d/flask-app.conf`. To prevent nginx from loading the default configuration file, comment out the line `include /etc/nginx/sites-enabled/*;` in the file `/etc/nginx/nginx.conf`.
+
+
 ### Requirements
 
 Run `pip install -r requirements.txt` to install all necessary libraries.
 
 - Flask
 - Gunicorn
+- Redis
