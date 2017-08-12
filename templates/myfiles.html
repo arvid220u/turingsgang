@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Mina filer - Turings gäng{% endblock %}
+{% block nav_editor %}navbaractive{% endblock %}
+
+{% block body %}
+
+    <div id="myfilesbody">
+
+        <h1>Mina filer</h1>
+
+        {% if logged_in %}
+            {% if myfiles|length != 0 %}
+                <table class="realtable myfilestable">
+                    <tr class="tableheader">
+                        <td>Filnamn</td>
+                        <td>Senast ändrad</td>
+                    </tr>
+                    {% for myfile in myfiles %}
+                    <tr class="filenamerow">
+                        <td class="filenamecell"><a href="{{ url_for('file', id=myfile['fileid'], _external=True, _scheme='https') }}" target="_blank">{{ myfile['filename'] }}</a></td>
+                        <td class="lastupdatedcell">{{ myfile['lastupdateddate'].strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div id="myfilesnofiles" class="myfilesblankpage">
+                    <p>
+                    Inga filer än. <a href="{{ url_for('newfile', _external=True, _scheme='https') }}">Skapa ny fil!</a>
+                    </p>
+                </div>
+            {% endif %}
+        {% else %}
+        <div class="myfilesblankpage" id="myfilesnotloggedin">
+            <p>
+            För att använda editorn måste du först <a href="{{ url_for('login', urlfrom=request.url, _external=True, _scheme='https') }}">logga in</a>.
+            </p>
+        </div>
+        {% endif %}
+
+
+
+            
+            
+
+    </div>
+
+
+
+
+
+{% endblock %} 

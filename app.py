@@ -7,6 +7,9 @@ from base64 import b64encode
 from datetime import datetime
 import time
 
+# set timezone
+os.environ["TZ"] = "Europe/Stockholm"
+
 from flask import *
 app = Flask(__name__)
 app.config.from_object(__name__) # configure from this file
@@ -17,6 +20,15 @@ app.config["PREFERRED_URL_SCHEME"] = "https"
 # apparently this is for safety of some sort
 def rlpt(pt):
     return os.path.join(app.root_path, pt)
+
+
+@app.route("/loaderio-74214b0f5a6a4416bafb4a09fa7769b5.txt")
+def authenticate_for_loaderio():
+    return "loaderio-74214b0f5a6a4416bafb4a09fa7769b5"
+
+@app.route("/googled4987f8a6a3dfeee.html")
+def authenticate_for_google():
+    return "google-site-verification: googled4987f8a6a3dfeee.html"
 
 
 # DATABASE
@@ -546,7 +558,81 @@ def grade(problemid, submissionid, submissiontext):
 
 @app.route("/editor")
 def editor():
-    return "this is da editor"
+
+    myfiles = []
+    if logged_in():
+        db = get_db()
+        cur = db.execute("SELECT * FROM files WHERE userid = '" + user_id() + "'")
+        results = cur.fetchall()
+        results.sort(key = lambda k: k["filename"])
+        myfiles = results
+    
+    return render_template("myfiles.html", myfiles=myfiles, logged_in=logged_in(), username=get_username())
+
+@app.route("/newfile")
+def newfile():
+    if not logged_in():
+        return redirect(url_for('login', g="true",  _external=True, _scheme="https"))
+
+    # create a file with filename namnlos.cpp
+    # append a number in order for it to be unique
+    # also generate a file id
+    fileid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+    db = get_db()
+
+    # make sure fileid is unique
+    fileidcur = db.execute("SELECT COUNT(1) from files WHERE fileid ='" + fileid + "'")
+    while fileidcur.fetchone()[0] != 0:
+        fileid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+        fileidcur = db.execute("SELECT COUNT(1) from files WHERE fileid ='" + fileid + "'")
+
+
+    filename = "Namnlös fil"
+    # make sure filename is unique
+    filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "'")
+    filecount = 2
+    while filenamecur.fetchone()[0] != 0:
+        filename = "Namnlös fil "  + str(filecount)
+        filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "'")
+        filecount += 1
+
+    db.execute("INSERT into files (fileid, userid, creationdate, lastupdateddate, filename) values (?, ?, ?, ?, ?)", (fileid, user_id(), datetime.now(), datetime.now(), filename))
+
+    db.commit()
+
+    # create the actual file
+    filecontents = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n    \n    \n    return 0;\n}"
+    realfilename = rlpt("data/" + fileid + ".cpp")
+    with open(realfilename, "w") as realfile:
+        realfile.write(filecontents)
+
+    return redirect(url_for('file', id=fileid, _external=True, _scheme="https"))
+
+
+@app.route("/file", methods=["GET"])
+def file():
+    fileid = request.args["id"]
+    db = get_db()
+    filecur = db.execute("SELECT * FROM files WHERE fileid ='" + fileid + "' AND userid ='" + user_id() + "'")
+    results = filecur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+    myfile = results[0]
+
+    filecontents = ""
+    realfilename = rlpt("data/" + fileid + ".cpp")
+    if not os.path.exists(realfilename):
+        filecontents = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n    \n    \n    return 0;\n}"
+        with open(realfilename, "w") as realfile:
+            realfile.write(filecontents)
+    else:
+        with open(realfilename, "r") as realfile:
+            filecontents = realfile.read()
+
+    safefilecontents = json.dumps(filecontents)
+
+    return render_template("file.html", myfile=myfile, filecontents=safefilecontents, logged_in=logged_in(), username=get_username())
+
 
 
 

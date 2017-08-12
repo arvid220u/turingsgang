@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ myfile['filename'] }} - Turings gäng{% endblock %}
+
+{% block bodyid %}bodyfileeditor{% endblock %}
+
+
+{% block nav_editor %}navbaractive{% endblock %}
+
+{% block viewport %}{% endblock %}
+
+{% block centernavigation %}
+<td class="centernavigationfile">
+{{ myfile['filename'] }}
+</td>
+{% endblock %}
+
+{% block body %}
+
+
+<script>
+        // global variables
+        var fileid = "{{ myfile['fileid'] }}";
+        var separator = "%%%arvidlunnemarkwowcool%%%";
+        var updatecount = 0;
+        function runbutton() {
+            document.getElementById("output").value = "";
+            var cppfile = editor.getSession().getValue();
+            var inputfile = document.getElementById("input").value;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    document.getElementById("output").value = xhr.responseText;
+                    document.getElementById("statustext").innerHTML = "Finished.";
+                }
+            }
+            document.getElementById("statustext").innerHTML = "Running...";
+            xhr.open("POST", "compileandrun", true);
+            xhr.send(fileid + separator + cppfile + separator + inputfile);
+        }
+        
+        function stopbutton() {
+            document.getElementById("statustext").innerHTML = "Idle.";
+            document.getElementById("input").value = "";
+            document.getElementById("output").value = "";
+        }
+            
+    </script>
+
+
+    <table id="editortable">
+    
+        <tr>
+
+
+            <td id="editorleftpanel">
+
+                <div id="editor"></div>
+
+                <script src="{{ url_for('static',filename='ace-builds/src-noconflict/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+                <script>
+                    var editor = ace.edit("editor");
+                    editor.setShowPrintMargin(false);
+                    editor.setTheme("ace/theme/textmate");
+                    editor.getSession().setMode("ace/mode/c_cpp");
+                    var cur_str = {{ filecontents | safe }};
+                    editor.setValue(cur_str,1);
+                    editor.gotoLine(6,4);
+                    editor.getSession().on('change', function() {
+                        updatecount += 1;
+                        if (updatecount > 100) {
+                            update();
+                            updatecount = 0;
+                        }
+                    });
+                    function update() 
+                    {
+                        var cppfile = editor.getSession().getValue();
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("POST", "savefile", true);
+                        xhr.send(fileid + separator + cppfile);
+                    }
+                </script>
+
+            </td>
+
+            <td id="editorrightpanel" valign="top">
+
+                <div id="editorcontrolpanel">
+                    <table id="editorrunstop">
+                        <tr>
+                            <td>
+                                <button onclick="runbutton()" class="editorbutton" id="editorrunbutton">Run</button>
+                            </td>
+                            <td>
+                                <button onclick="stopbutton()" class="editorbutton" id="editorstopbutton">Stop</button>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="editorstatustext">Idle.</div>
+                </div>
+
+                <h4>Input</h4>
+
+                <textarea class="editortextarea editorio autoExpand" rows="10" data-min-rows="6" id="editorinput"></textarea>
+
+                <h4>Output</h4>
+
+                <textarea class="editortextarea edtiorio autoExpand" rows="10" data-min-rows="6" id="editoroutput" readonly></textarea>
+
+                <br>
+                <br>
+
+
+                <div id="editorerrormessage"></div>
+
+        </tr>
+
+    </table>    
+
+
+{% endblock %}

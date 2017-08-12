@@ -8,30 +8,33 @@
     <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Inconsolata|Merriweather|Open+Sans:400,700" rel="stylesheet">
 
-    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+    {% block viewport %}<meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />{% endblock %}
 
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [['$','$'], ['\\(','\\)']],
-                processEscapes: true
-            }
-        });
-    </script>
-    <script type="text/javascript" async
-      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    {% macro needsmath() %}
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [['$','$'], ['\\(','\\)']],
+                    processEscapes: true
+                }
+            });
+        </script>
+        <script type="text/javascript" async
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+    {% endmacro %}
 
     {% block head %}{% endblock %}
 
  
 </head>
  
-<body>
+<body class="{% block bodyid %}{% endblock %}">
     <nav>
         <table id="navigationtable">
             <tr>
                 <td class="brandrow"><a href="{{ url_for('home') }}"><span class="turing">Turings</span> <span class="gang">gäng</span><span class ="semicolon">;</span></a></td>
+                {% block centernavigation %}
                 <td class="centernavigationtablerow">
                     <table id="centernavigationtable">
                         <tr>
@@ -42,6 +45,7 @@
                         </tr>
                     </table>
                 </td>
+                {% endblock %}
                 {% if logged_in %}
                 <td class="loginrow"><span id="loggedinmessage">{{ username }}</span><br> <a class="logoutlink"href="{{ url_for('logout', from=request.url, _external=True, _scheme='https') }}">Logga ut</a></td>
                 {% else %}
