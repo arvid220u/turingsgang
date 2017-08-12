@@ -15,3 +15,11 @@ create table submissions (
     submissionstatus text,
     executiontime text
 );
+drop table if exists files;
+create table files (
+    fileid text primary key not null,
+    userid text not null,
+    creationdate timestamp,
+    lastupdateddate timestamp,
+    filename text not null
+);
