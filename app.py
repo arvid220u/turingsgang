@@ -611,6 +611,9 @@ def newfile():
 
 @app.route("/file/<fileid>", methods=["GET"])
 def file(fileid):
+    if not logged_in():
+        return abort(404)
+
     db = get_db()
     filecur = db.execute("SELECT * FROM files WHERE fileid ='" + fileid + "' AND userid ='" + user_id() + "'")
     results = filecur.fetchall()
@@ -634,12 +637,17 @@ def file(fileid):
 
 @app.route("/changefilename", methods=["POST"])
 def changefilename():
+    if not logged_in():
+        return abort(404)
+
     indata = request.data.decode("utf-8")
     filedata = json.loads(indata)
 
     db = get_db()
     db.execute("UPDATE files SET filename = '" + filedata["filename"] + "' WHERE fileid = '" + filedata["fileid"] + "'")
+    db.execute("UPDATE files SET lastupdateddate = '" + str(datetime.now()) + "' WHERE fileid = '" + filedata["fileid"] + "'")
     db.commit()
+
 
     return "Successfully changed name!"
 
@@ -647,6 +655,7 @@ def changefilename():
 
 @app.route("/savefile", methods=["POST"])
 def savefile():
+
     indata = request.data.decode("utf-8")
     filedata = json.loads(indata)
 
@@ -654,11 +663,19 @@ def savefile():
     with open(realfilename, "w") as realfile:
         realfile.write(filedata["filecontents"])
 
+    # change date of last updated file
+    db = get_db()
+    db.execute("UPDATE files SET lastupdateddate = '" + str(datetime.now()) + "' WHERE fileid = '" + filedata["fileid"] + "'")
+    db.commit()
+
     return "Successfully saved!"
 
 
 @app.route("/compileandrun", methods=["POST"])
 def compileandrun():
+    if not logged_in():
+        return abort(404)
+
     # get data from post
     indata = request.data.decode("utf-8")
     filedata = json.loads(indata)
@@ -700,6 +717,11 @@ def compileandrun():
         with open(compiledfilename, "w") as compiledfile:
             compiledfile.write(filecontents)
 
+    if compileddifferent:
+        # change date of last updated file
+        db = get_db()
+        db.execute("UPDATE files SET lastupdateddate = '" + str(datetime.now()) + "' WHERE fileid = '" + filedata["fileid"] + "'")
+        db.commit()
 
     returndata = {}
 
