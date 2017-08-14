@@ -17,7 +17,7 @@
                     </tr>
                     {% for myfile in myfiles %}
                     <tr class="filenamerow">
-                        <td class="filenamecell"><a href="{{ url_for('file', id=myfile['fileid'], _external=True, _scheme='https') }}" target="_blank">{{ myfile['filename'] }}</a></td>
+                        <td class="filenamecell"><a href="{{ url_for('file', fileid=myfile['fileid'], _external=True, _scheme='https') }}" target="_blank">{{ myfile['filename'] }}</a></td>
                         <td class="lastupdatedcell">{{ myfile['lastupdateddate'].strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>
                     {% endfor %}

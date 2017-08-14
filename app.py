@@ -606,12 +606,11 @@ def newfile():
     with open(realfilename, "w") as realfile:
         realfile.write(filecontents)
 
-    return redirect(url_for('file', id=fileid, _external=True, _scheme="https"))
+    return redirect(url_for('file', fileid=fileid, _external=True, _scheme="https"))
 
 
-@app.route("/file", methods=["GET"])
-def file():
-    fileid = request.args["id"]
+@app.route("/file/<fileid>", methods=["GET"])
+def file(fileid):
     db = get_db()
     filecur = db.execute("SELECT * FROM files WHERE fileid ='" + fileid + "' AND userid ='" + user_id() + "'")
     results = filecur.fetchall()
@@ -632,6 +631,139 @@ def file():
     safefilecontents = json.dumps(filecontents)
 
     return render_template("file.html", myfile=myfile, filecontents=safefilecontents, logged_in=logged_in(), username=get_username())
+
+@app.route("/changefilename", methods=["POST"])
+def changefilename():
+    indata = request.data.decode("utf-8")
+    filedata = json.loads(indata)
+
+    db = get_db()
+    db.execute("UPDATE files SET filename = '" + filedata["filename"] + "' WHERE fileid = '" + filedata["fileid"] + "'")
+    db.commit()
+
+    return "Successfully changed name!"
+
+
+
+@app.route("/savefile", methods=["POST"])
+def savefile():
+    indata = request.data.decode("utf-8")
+    filedata = json.loads(indata)
+
+    realfilename = rlpt("data/" + filedata["fileid"] + ".cpp")
+    with open(realfilename, "w") as realfile:
+        realfile.write(filedata["filecontents"])
+
+    return "Successfully saved!"
+
+
+@app.route("/compileandrun", methods=["POST"])
+def compileandrun():
+    # get data from post
+    indata = request.data.decode("utf-8")
+    filedata = json.loads(indata)
+    fileid = filedata["fileid"]
+    filecontents = filedata["filecontents"]
+    inputdata = filedata["inputfile"]
+
+
+    # create the filename
+    filename = rlpt("data/" + fileid + ".cpp")
+    exfilename = filename + ".x"
+    infilename = filename + ".in"
+    compiledfilename = filename + ".compiled.cpp"
+    # write to the file
+    with open(filename, "w") as cppfile:
+        cppfile.write(filecontents)
+
+    # create the infile
+    with open(infilename, "w") as infile:
+        infile.write(inputdata)
+
+
+    # if filecontents uses bits/stdc++.h, include allc++.h instead for faster compilation time (precompiled header)
+    # we don't do this in judging though, since it is potentially dangerous (for unclear reasons, though)
+    # IMPORTANT: make sure the allc++.h file is present in the same folder as the 'compiledfilename' file.
+    # the allc++.h file should contain a single row, including bits/stdc++.h.
+    # it should be compiled in the same folder, to the filename allc++.h.gch
+    if filecontents.startswith("#include <bits/stdc++.h>\n"):
+        filecontents = filecontents.split("\n", 1)[1]
+        filecontents = '#include "allc++.h"\n' + filecontents
+
+    # check if compiled file is different
+    compileddifferent = True
+    if os.path.exists(compiledfilename):
+        with open(compiledfilename, "r") as compiledfile:
+            if compiledfile.read() == filecontents:
+                compileddifferent = False
+    if compileddifferent:
+        with open(compiledfilename, "w") as compiledfile:
+            compiledfile.write(filecontents)
+
+
+    returndata = {}
+
+    returndata["success"] = True
+
+    # compile the file to the exfile
+    if compileddifferent:
+        compileoutput = ""
+        compileerror = ""
+        try:
+            popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            compileoutput, compileerror = popn.communicate()
+        except Exception as exception:
+            pass
+        compileoutput = compileoutput.decode("utf-8")
+        compileerror = compileerror.decode("utf-8")
+        # remove all references to the filename
+        compileerror = compileerror.replace(compiledfilename, "")
+        if popn.returncode != 0:
+            os.remove(infilename)
+            returndata["success"] = False
+            returndata["compileerror"] = compileerror
+            with open(compiledfilename, "w") as compiledfile:
+                compiledfile.write("wweifojqwoifjq")
+            return json.dumps(returndata)
+        if not os.path.exists(exfilename):
+            os.remove(infilename)
+            returndata["success"] = False
+            returndata["compileerror"] = "A mysterious error occurred. No one knows why. Try again, maybe?"
+            with open(compiledfilename, "w") as compiledfile:
+                compiledfile.write("wweifojqwoifjq")
+            return json.dumps(returndata)
+        returndata["compilewarnings"] = compileerror
+
+    # get the output
+    output = ""
+    try:
+        with open(infilename, "rb") as infile:
+            starttime = time.time()
+            result = subprocess.run([os.path.abspath(exfilename)], stdin=infile, timeout=4, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            endtime = time.time()
+            returndata["executiontime"] = "{:.2f}".format(endtime - starttime) + " s"
+            if result.stderr.decode("utf-8") != "":
+                returndata["runtimeerror"] = result.stderr.decode("utf-8").replace(compiledfilename, "")
+            result.check_returncode()
+            output = result.stdout.decode("utf-8")
+    except subprocess.TimeoutExpired as timeoutexception:
+        os.remove(infilename)
+        returndata["success"] = False
+        returndata["timeout"] = True
+        returndata["executiontime"] = ">4.00 s"
+        return json.dumps(returndata)
+    except Exception as exception:
+        os.remove(infilename)
+        returndata["success"] = False
+        return json.dumps(returndata)
+
+    # remove temporary files
+    os.remove(infilename)
+
+    returndata["output"] = output
+
+    # return the output
+    return json.dumps(returndata)
 
 
 

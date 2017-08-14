@@ -8,9 +8,44 @@
 
 {% block viewport %}{% endblock %}
 
+{% block head %}
+<script>
+function filenamechange(inputfield) {
+    if (event.keyCode == 13) {
+        inputfield.blur();
+    }
+}
+var lastfilename = "{{ myfile['filename'] }}";
+function filenamelostfocus(inputfield) {
+    newfilename = inputfield.value;
+
+    // verify filename
+    if (newfilename == "") {
+        inputfield.value = lastfilename;
+        return;
+    }
+    lastfilename = newfilename;
+    document.title = newfilename + " - Turings gäng";
+
+    var xhr = new XMLHttpRequest();
+    var savedfile = {};
+    savedfile["fileid"] = fileid;
+    savedfile["filename"] = newfilename;
+    xhr.open("POST", "/changefilename", true);
+    xhr.send(JSON.stringify(savedfile));
+}
+function selectall(inputfield) {
+    if (inputfield.value.startsWith("Namnlös")) {
+        inputfield.setSelectionRange(0, inputfield.value.length);
+    }
+}
+
+</script>
+{% endblock %}
+
 {% block centernavigation %}
 <td class="centernavigationfile">
-{{ myfile['filename'] }}
+    <input spellcheck="false" class="filenameinput" type="text" value="{{ myfile['filename'] }}" onkeydown="filenamechange(this)" onfocusout="filenamelostfocus(this)" onclick="selectall(this)">
 </td>
 {% endblock %}
 
@@ -20,28 +55,82 @@
 <script>
         // global variables
         var fileid = "{{ myfile['fileid'] }}";
-        var separator = "%%%arvidlunnemarkwowcool%%%";
         var updatecount = 0;
+        var xhr = null;
         function runbutton() {
-            document.getElementById("output").value = "";
+            document.getElementById("editoroutput").value = "";
             var cppfile = editor.getSession().getValue();
-            var inputfile = document.getElementById("input").value;
-            var xhr = new XMLHttpRequest();
+            var inputfile = document.getElementById("editorinput").value;
+            xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    document.getElementById("output").value = xhr.responseText;
-                    document.getElementById("statustext").innerHTML = "Finished.";
+                    var fullresponse = JSON.parse(xhr.responseText);
+                    document.getElementById("editorcontextualstatuslink").style.display = "none";
+                    document.getElementById("editorcontextualstatusmessage").style.display = "inline";
+                    document.getElementById("editorcontextualstatusplaceholder").style.display = "none";
+                    document.getElementById("editorerrormessage").innerHTML = "";
+                    document.getElementById("editorerrormessage").style.display = "none";
+                    document.getElementById("editorrunbutton").innerHTML = "Run";
+                    document.getElementById("editorrunbutton").className = "";
+                    if (fullresponse["success"]) {
+                        document.getElementById("editoroutput").value = fullresponse["output"];
+                        document.getElementById("editorcontextualstatusmessage").innerHTML = "Success! (" + fullresponse["executiontime"] + ")";
+                        if ("runtimeerror" in fullresponse) {
+                            document.getElementById("editorerrormessage").innerHTML = fullresponse["runtimeerror"];
+                            document.getElementById("editorerrormessage").style.display = "block";
+                        } else {
+                            document.getElementById("editorerrormessage").innerHTML = "";
+                            document.getElementById("editorerrormessage").innerHTML = "";
+                            document.getElementById("editorerrormessage").style.display = "none";
+                        }
+                    } else {
+                        document.getElementById("editorcontextualstatusmessage").innerHTML = "An error occurred.";
+                        document.getElementById("editoroutput").value = "";
+                        if ("runtimeerror" in fullresponse) {
+                            document.getElementById("editorerrormessage").innerHTML = fullresponse["runtimeerror"];
+                            document.getElementById("editorerrormessage").style.display = "none";
+                        }
+                        if ("compileerror" in fullresponse) {
+                            document.getElementById("editorerrormessage").innerHTML = fullresponse["compileerror"];
+                            document.getElementById("editorerrormessage").style.display = "block";
+                        }
+                        if ("timeout" in fullresponse) {
+                            if (fullresponse["timeout"]) {
+                                document.getElementById("editorcontextualstatusmessage").innerHTML = "The execution timed out. (" + fullresponse["executiontime"] + ")";
+                            }
+                        }
+                    }
+
+
                 }
             }
-            document.getElementById("statustext").innerHTML = "Running...";
-            xhr.open("POST", "compileandrun", true);
-            xhr.send(fileid + separator + cppfile + separator + inputfile);
+            var filedata = {};
+            filedata["fileid"] = fileid;
+            filedata["filecontents"] = cppfile;
+            filedata["inputfile"] = inputfile;
+            xhr.open("POST", "/compileandrun", true);
+            document.getElementById("editorcontextualstatuslink").style.display = "inline";
+            document.getElementById("editorcontextualstatusmessage").style.display = "none";
+            document.getElementById("editorcontextualstatusplaceholder").style.display = "none";
+            document.getElementById("editorrunbutton").innerHTML = "Running...";
+            document.getElementById("editorerrormessage").innerHTML = "";
+            document.getElementById("editorerrormessage").style.display = "none";
+            document.getElementById("editorrunbutton").className = "editorrunbuttonrunning";
+            xhr.send(JSON.stringify(filedata));
         }
         
         function stopbutton() {
-            document.getElementById("statustext").innerHTML = "Idle.";
-            document.getElementById("input").value = "";
-            document.getElementById("output").value = "";
+            if (xhr != null) {
+                xhr.abort();
+            }
+            document.getElementById("editoroutput").value = "";
+            document.getElementById("editorcontextualstatuslink").style.display = "none";
+            document.getElementById("editorcontextualstatusmessage").style.display = "none";
+            document.getElementById("editorcontextualstatusplaceholder").style.display = "inline";
+            document.getElementById("editorerrormessage").innerHTML = "";
+            document.getElementById("editorerrormessage").style.display = "none";
+            document.getElementById("editorrunbutton").innerHTML = "Run";
+            document.getElementById("editorrunbutton").className = "";
         }
             
     </script>
@@ -54,11 +143,11 @@
 
             <td id="editorleftpanel">
 
-                <div id="editor"></div>
+                <div id="editoreditor"></div>
 
                 <script src="{{ url_for('static',filename='ace-builds/src-noconflict/ace.js') }}" type="text/javascript" charset="utf-8"></script>
                 <script>
-                    var editor = ace.edit("editor");
+                    var editor = ace.edit("editoreditor");
                     editor.setShowPrintMargin(false);
                     editor.setTheme("ace/theme/textmate");
                     editor.getSession().setMode("ace/mode/c_cpp");
@@ -67,7 +156,7 @@
                     editor.gotoLine(6,4);
                     editor.getSession().on('change', function() {
                         updatecount += 1;
-                        if (updatecount > 100) {
+                        if (updatecount > 10) {
                             update();
                             updatecount = 0;
                         }
@@ -76,8 +165,11 @@
                     {
                         var cppfile = editor.getSession().getValue();
                         var xhr = new XMLHttpRequest();
-                        xhr.open("POST", "savefile", true);
-                        xhr.send(fileid + separator + cppfile);
+                        var savedfile = {};
+                        savedfile["fileid"] = fileid;
+                        savedfile["filecontents"] = cppfile;
+                        xhr.open("POST", "/savefile", true);
+                        xhr.send(JSON.stringify(savedfile));
                     }
                 </script>
 
@@ -86,32 +178,20 @@
             <td id="editorrightpanel" valign="top">
 
                 <div id="editorcontrolpanel">
-                    <table id="editorrunstop">
-                        <tr>
-                            <td>
-                                <button onclick="runbutton()" class="editorbutton" id="editorrunbutton">Run</button>
-                            </td>
-                            <td>
-                                <button onclick="stopbutton()" class="editorbutton" id="editorstopbutton">Stop</button>
-                            </td>
-                        </tr>
-                    </table>
-                    <div id="editorstatustext">Idle.</div>
+                    <button onclick="runbutton()" id="editorrunbutton">Run</button>
+                    <div id="editorcontextualstatusdiv"><a onclick="stopbutton()" style="display:none;" id="editorcontextualstatuslink">Stop</a><span style="display:none;" id="editorcontextualstatusmessage">Finished.</span><span id="editorcontextualstatusplaceholder">Meh.</span></div>
                 </div>
 
-                <h4>Input</h4>
+                <div id="editorerrormessage" style="display:none;"></div>
 
-                <textarea class="editortextarea editorio autoExpand" rows="10" data-min-rows="6" id="editorinput"></textarea>
+                <h4 class="editoriolabel">Input</h4>
 
-                <h4>Output</h4>
+                <textarea class="editortextarea editorio" id="editorinput"></textarea>
 
-                <textarea class="editortextarea edtiorio autoExpand" rows="10" data-min-rows="6" id="editoroutput" readonly></textarea>
+                <h4 class="editoriolabel" id="editoroutputlabel">Output</h4>
 
-                <br>
-                <br>
+                <textarea class="editortextarea editorio" id="editoroutput" readonly></textarea>
 
-
-                <div id="editorerrormessage"></div>
 
         </tr>
 
