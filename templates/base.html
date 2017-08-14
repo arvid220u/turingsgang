@@ -40,7 +40,7 @@
                         <tr>
                             <td class="leftnavlink {% block nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
                             <td class="leftnavlink {% block nav_feed %}{% endblock %}"><a href="{{ url_for('feed') }}">Flöde</a></td>
-                            <td class="leftnavlink {% block nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Alla problem</a></td>
+                            <td class="leftnavlink {% block nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Problem</a></td>
                             <td class="leftnavlink {% block nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
                         </tr>
                     </table>
@@ -55,10 +55,10 @@
         </table>
                     <table id="mobilenavigationtable">
                         <tr>
-                            <td class="mobileleftnavlink {% block mobile_nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
+                            <td class="mobileleftnavlink mobileleftnavlinkleftest {% block mobile_nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
                             <td class="mobileleftnavlink {% block mobile_nav_feed %}{% endblock %}"><a href="{{ url_for('feed') }}">Flöde</a></td>
-                            <td class="mobileleftnavlink {% block mobile_nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Alla problem</a></td>
-                            <td class="mobileleftnavlink {% block mobile_nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
+                            <td class="mobileleftnavlink {% block mobile_nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Problem</a></td>
+                            <td class="mobileleftnavlink mobileleftnavlinkrightest {% block mobile_nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
                         </tr>
                     </table>
     </nav>
