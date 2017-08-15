@@ -10,10 +10,10 @@
         <div id="myfilesheaderflexbox">
             <h1 id="myfilesheader">Mina filer</h1>
 
-            <a id="newfilelink" target="_blank" href="{{ url_for('newfile', _external=True, _scheme='https') }}">Ny fil</a>
-        </div>
 
         {% if logged_in %}
+            <a id="newfilelink" target="_blank" href="{{ url_for('newfile', _external=True, _scheme='https') }}">Ny fil</a>
+        </div>
             {% if myfiles|length != 0 %}
                 <table class="realtable myfilestable">
                     <tr class="tableheader">
@@ -37,6 +37,7 @@
                 </div>
             {% endif %}
         {% else %}
+    </div>
         <div class="myfilesblankpage" id="myfilesnotloggedin">
             <p>
             För att använda editorn måste du först <a href="{{ url_for('login', urlfrom=request.url, _external=True, _scheme='https') }}">logga in</a>.
