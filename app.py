@@ -172,7 +172,7 @@ def signup():
         passwordhash = md5(request.form["password"].encode("utf-8")).hexdigest()
         print("passwordhash: " + passwordhash)
         email = request.form['email']
-        userid = b64encode(os.urandom(64)).decode("utf-8")
+        userid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
 
         db = get_db()
 
@@ -185,10 +185,10 @@ def signup():
         # make sure userid is unique
         useridcur = db.execute("SELECT COUNT(1) from users WHERE userid ='" + userid + "'")
         while useridcur.fetchone()[0] != 0:
-            userid = b64encode(os.urandom(64)).decode("utf-8")
+            userid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
             useridcur = db.execute("SELECT COUNT(1) from users WHERE userid ='" + userid + "'")
 
-        db.execute("INSERT into users (username, userid, passwordhash, email) values ('" + username + "', '" + userid + "', '" + passwordhash + "', '" + email + "')")
+        db.execute("INSERT into users (username, userid, passwordhash, email, groupstatus) values ('" + username + "', '" + userid + "', '" + passwordhash + "', '" + email + "', 'regular')")
 
         db.commit()
         
@@ -414,10 +414,10 @@ def submit():
         db = get_db()
 
         # create a random submission id
-        submissionid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+        submissionid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
         submissionidcur = db.execute("SELECT COUNT(1) from submissions WHERE submissionid ='" + submissionid + "'")
         while submissionidcur.fetchone()[0] != 0:
-            submissionid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+            submissionid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
             submissionidcur = db.execute("SELECT COUNT(1) from submissions WHERE submissionid ='" + submissionid + "'")
 
         # create a database entry for this submission, and add the submission to the submission queue
@@ -618,13 +618,13 @@ def newfile():
     # create a file with filename namnlos.cpp
     # append a number in order for it to be unique
     # also generate a file id
-    fileid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+    fileid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
     db = get_db()
 
     # make sure fileid is unique
     fileidcur = db.execute("SELECT COUNT(1) from files WHERE fileid ='" + fileid + "'")
     while fileidcur.fetchone()[0] != 0:
-        fileid = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+        fileid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
         fileidcur = db.execute("SELECT COUNT(1) from files WHERE fileid ='" + fileid + "'")
 
 

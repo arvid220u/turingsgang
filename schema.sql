@@ -3,7 +3,8 @@ create table users (
     userid text primary key not null,
     username text not null,
     email text not null,
-    passwordhash not null
+    passwordhash text not null,
+    groupstatus text
 );
 drop table if exists submissions;
 create table submissions (
