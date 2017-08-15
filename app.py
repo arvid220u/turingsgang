@@ -60,23 +60,27 @@ app.config['REDIS_QUEUE_KEY'] = 'submissionsqueue'
 from redis import Redis
 redis = Redis()
 
-separator = "%%%%%%%%%%%%%%arvidlunnemarkisdabestevercoolestguywowowow%%%%%%%%%%%%%%"
 def submissionsdaemon():
     while True:
         try:
             while 1:
                 msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
                 datastring = msg[1].decode("utf-8")
-                datalist = datastring.split(separator)
-                problemid = datalist[0]
-                submissionid = datalist[1]
-                submissiontext = datalist[2]
+                datalist = json.loads(datastring)
+                problemid = datalist["problemid"]
+                submissionid = datalist["submissionid"]
+                submissiontext = datalist["submissiontext"]
                 grade(problemid, submissionid, submissiontext)
         except Exception as exception:
             continue
 
 def delaygradesubmission(problemid, submissionid, submissiontext):
-    datastring = problemid + separator + submissionid + separator + submissiontext
+    #datastring = problemid + separator + submissionid + separator + submissiontext
+    datadict = {}
+    datadict["problemid"] = problemid
+    datadict["submissionid"] = submissionid
+    datadict["submissiontext"] = submissiontext
+    datastring = json.dumps(datadict)
     redis.rpush(current_app.config['REDIS_QUEUE_KEY'], datastring)
 
 

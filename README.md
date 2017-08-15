@@ -20,6 +20,12 @@ Nginx is used.
 The nginx config file used is located at `/etc/nginx/conf.d/flask-app.conf`. To prevent nginx from loading the default configuration file, comment out the line `include /etc/nginx/sites-enabled/*;` in the file `/etc/nginx/nginx.conf`.
 
 
+### Redis
+
+Redis is used for the judging queue.
+
+Use the `screen` command tool to manage Redis. We need two screens: (1) redis, and (2) redisdaemon. (1) runs the command `redis-server`, and (2) runs the command `./redisdaemon.py`.
+
 ### Requirements
 
 Run `pip install -r requirements.txt` to install all necessary libraries.
