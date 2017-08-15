@@ -6,7 +6,7 @@ from hashlib import md5
 from base64 import b64encode
 from datetime import datetime
 import time
-import config
+import config as turingconfig
 
 # set timezone
 os.environ["TZ"] = "Europe/Stockholm"
@@ -14,7 +14,7 @@ os.environ["TZ"] = "Europe/Stockholm"
 from flask import *
 app = Flask(__name__)
 app.config.from_object(__name__) # configure from this file
-app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
+app.config["SECRET_KEY"] = turingconfig.FLASK_SECRET_KEY
 #HTTPS
 app.config["PREFERRED_URL_SCHEME"] = "https"
 
