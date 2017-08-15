@@ -3,6 +3,8 @@ An online judge for competitive programming.
 
 ## Setup
 
+Rename the `config_template.py` file to `config.py` and enter all relevant config data.
+
 Use a `virtualenv`.
 
 Use with Nginx in production. See https://blog.marksteve.com/deploy-a-flask-application-inside-a-digitalocean-droplet/.
