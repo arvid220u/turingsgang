@@ -44,6 +44,15 @@ a:visited {
     background-color: rgb(255,255,255);
     padding-bottom: 2em;
 }
+#controlpanelbody {
+    font-family: "Open Sans", sans-serif;
+    padding: 1em 2em;
+    max-width: 50em;
+    margin: auto;
+    margin-top: 1em;
+    background-color: rgb(255,255,255);
+    padding-bottom: 2em;
+}
 #problembody {
     font-family: Merriweather, serif;
     padding: 1em 2em;

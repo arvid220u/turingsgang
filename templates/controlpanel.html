@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Kontrollpanel - Turings gäng{% endblock %}
+
+{% block body %}
+
+<div id="controlpanelbody">
+
+    <h1>Kontrollpanel</h1>
+
+    <h2>Användare</h2>
+
+    <table class="realtable" id="controlpaneluserstable">
+        <tr class="tableheader">
+            <td>Username</td>
+            <td>Email</td>
+        </tr>
+        {% for user in allusers %}
+        <tr>
+            <td><a href="{{ url_for('userstats', userid=user['userid'], _external=True, _scheme='https') }}">{{ user['username'] }}</a></td>
+            <td>{{ user['email'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}
+        

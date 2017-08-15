@@ -861,5 +861,55 @@ def about():
     return render_template("about.html", logged_in=logged_in(), username=get_username())
 
 
+
+def is_admin():
+    return (get_username() == "arvid220u" or get_username() == "Teodor Bucht")
+
+# control panel, only for arvid220u and teodor bucht
+@app.route("/controlpanel")
+def controlpanel():
+    if not logged_in():
+        return abort(404)
+    if not is_admin():
+        return abort(404)
+    # list all users, with links to their userstats page
+    # also list all assignments, showing solvecount and such things
+
+    db = get_db()
+    alluserscur = db.execute("SELECT * FROM users")
+    allusers = alluserscur.fetchall()
+
+    return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers)
+
+
+
+@app.route("/problemstats/<problemid>")
+def problemstats(problemid):
+    if not logged_in():
+        return abort(404)
+    # for now, only for admins
+    if not is_admin():
+        return abort(404)
+    # list all users who have solved it
+    # rank by cpu time, then by submission date
+    return "problemstats"
+
+
+@app.route("/userstats/<userid>")
+def userstats(userid):
+    if not logged_in():
+        return abort(404)
+    # for now, only for admins
+    if not is_admin():
+        return abort(404)
+    # list all solved problems and all unsolved
+    # show count
+    return "userstats"
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run()
