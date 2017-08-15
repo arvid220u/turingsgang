@@ -2,6 +2,7 @@
 data/*
 __pycache__/*
 app.db
+app.db.bak
 grading/*
 judgevenv/*
 logs/*

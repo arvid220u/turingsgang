@@ -13,6 +13,8 @@ SSL is good. Read https://certbot.eff.org. Use the following cron job for automa
 
 Run the app with the command `gunicorn app:app`.
 
+The database should be backed up daily. Add `22 4 * * * sqlite3 app.db ".backup app.db.bak"` to `crontab -e`.
+
 ### Server
 
 Nginx is used.
