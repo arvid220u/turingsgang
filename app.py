@@ -648,7 +648,7 @@ def newfile():
 @app.route("/file/<fileid>", methods=["GET"])
 def file(fileid):
     if not logged_in():
-        return abort(404)
+        return redirect(url_for('editor', _external=True, _scheme="https"))
 
     db = get_db()
     filecur = db.execute("SELECT * FROM files WHERE fileid ='" + fileid + "' AND userid ='" + user_id() + "'")
@@ -853,7 +853,7 @@ def feed():
 
 @app.route("/om")
 def about():
-    return "this is da om page"
+    return render_template("about.html", logged_in=logged_in(), username=get_username())
 
 
 if __name__ == "__main__":
