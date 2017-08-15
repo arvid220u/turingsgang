@@ -6,6 +6,7 @@ from hashlib import md5
 from base64 import b64encode
 from datetime import datetime
 import time
+import config
 
 # set timezone
 os.environ["TZ"] = "Europe/Stockholm"
@@ -13,7 +14,7 @@ os.environ["TZ"] = "Europe/Stockholm"
 from flask import *
 app = Flask(__name__)
 app.config.from_object(__name__) # configure from this file
-app.config["SECRET_KEY"] = "\x9d\xe4AS\xa5\xe6\xc7e\xb9\xa3:\xd1x\x17\x81V\x91p\xc1\xb0\x84\xaaBQd\xfbnZ\x96\x0e\xbd\xd7"
+app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 #HTTPS
 app.config["PREFERRED_URL_SCHEME"] = "https"
 
