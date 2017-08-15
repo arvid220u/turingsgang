@@ -895,7 +895,7 @@ def problemstats(problemid):
     return "problemstats"
 
 
-@app.route("/userstats/<userid>")
+@app.route("/user/<userid>")
 def userstats(userid):
     if not logged_in():
         return abort(404)
