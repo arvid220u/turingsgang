@@ -738,8 +738,23 @@ def compileandrun():
             pass
         compileoutput = compileoutput.decode("utf-8")
         compileerror = compileerror.decode("utf-8")
+
+        # check if there is an internal compile error present
+        if "internal compiler error" in compileerror:
+            print("RECOMPILING")
+            # try to compile again, using the original filename
+            try:
+                popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                compileoutput, compileerror = popn.communicate()
+            except Exception as exception:
+                pass
+            compileoutput = compileoutput.decode("utf-8")
+            compileerror = compileerror.decode("utf-8")
+
+
         # remove all references to the filename
         compileerror = compileerror.replace(compiledfilename, "")
+
         if popn.returncode != 0:
             os.remove(infilename)
             returndata["success"] = False
