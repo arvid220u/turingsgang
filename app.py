@@ -569,6 +569,42 @@ def editor():
     
     return render_template("myfiles.html", myfiles=myfiles, logged_in=logged_in(), username=get_username())
 
+@app.route("/deletefile", methods=["GET"])
+def deletefile():
+    if not logged_in():
+        abort(404)
+
+    fileid = request.args["fileid"]
+
+    db = get_db()
+    filecur = db.execute("SELECT * FROM files WHERE fileid ='" + fileid + "' AND userid ='" + user_id() + "'")
+    results = filecur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+    myfile = results[0]
+
+    # remove the file from the database, and all its associated files
+    db.execute("DELETE FROM files WHERE fileid ='" + fileid + "' AND userid = '" + user_id() + "'")
+    db.commit()
+    filename = rlpt("data/" + fileid + ".cpp")
+    exfilename = filename + ".x"
+    compiledfilename = filename + ".compiled.cpp"
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    try:
+        os.remove(exfilename)
+    except OSError:
+        pass
+    try:
+        os.remove(compiledfilename)
+    except OSError:
+        pass
+
+    return redirect(url_for('editor', _external=True, _scheme="https"))
+
+
 @app.route("/newfile")
 def newfile():
     if not logged_in():

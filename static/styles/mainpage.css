@@ -264,6 +264,9 @@ table.samples td {
     /*background-color: rgba(0,0,0,0.1);*/
     font-family: "Open Sans", sans-serif;
 }
+.removefilecell a {
+    color: rgba(239,17,29,1.0);
+}
 #faillabel {
     color: red;
 }
@@ -435,6 +438,12 @@ h1 {
 .myfilestable {
     width: 100%;
     font-family: "Open Sans", sans-serif;
+}
+#myfileslastupdatedtd {
+    width: 10em;
+}
+#myfilesremovetd {
+    width: 5.5em;
 }
 
 table.problemtable  tr  td.Accepted {

@@ -17,20 +17,22 @@
             {% if myfiles|length != 0 %}
                 <table class="realtable myfilestable">
                     <tr class="tableheader">
-                        <td>Filnamn</td>
-                        <td>Senast ändrad</td>
+                        <td id="myfilesfilenametd">Filnamn</td>
+                        <td id="myfileslastupdatedtd">Senast ändrad</td>
+                        <td id="myfilesremovetd">Ta bort fil</td>
                     </tr>
                     {% for myfile in myfiles %}
                     <tr class="filenamerow">
                         <td class="filenamecell"><a href="{{ url_for('file', fileid=myfile['fileid'], _external=True, _scheme='https') }}" target="_blank">{{ myfile['filename'] }}</a></td>
                         <td class="lastupdatedcell">{{ myfile['lastupdateddate'].strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="removefilecell"><a onclick="return confirm('Vill du radera {{ myfile['filename'] }}?');" href="{{ url_for('deletefile', fileid=myfile['fileid'], _external=True, _scheme='https') }}">Radera</a></td>
                     </tr>
                     {% endfor %}
                 </table>
             {% else %}
                 <div id="myfilesnofiles" class="myfilesblankpage">
                     <p>
-                    Inga filer än. <a href="{{ url_for('newfile', _external=True, _scheme='https') }}">Skapa ny fil!</a>
+                    Inga filer än. <a href="{{ url_for('newfile', _external=True, _scheme='https') }}" target="_blank">Skapa en ny fil!</a>
                     </p>
                 </div>
             {% endif %}
