@@ -431,7 +431,7 @@ h1 {
     font-weight: 700;
     font-family: "Open Sans", sans-serif;
 }
-#submissioninfo .Accepted, .submissions .Accepted {
+#submissioninfo .Accepted, .submissions .Accepted, #controlpanelbody .Accepted {
     color: rgba(61,187,71,1.0);
 }
 .Wrong.Answer, .Time.Limit.Exceeded, .Runtime.Error, .Compile.Error {

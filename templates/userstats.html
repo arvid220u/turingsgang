@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ user['username'] }} - Turings gäng{% endblock %}
+
+{% block body %}
+
+<div id="controlpanelbody">
+
+    <h1>{{ user['username'] }}</h1>
+
+    <h2>Problem</h2>
+
+    <table class="realtable problemtable">
+        <tr class="tableheader">
+            <td>Namn</td>
+            <td>Submissions</td>
+        </tr>
+        {% for problem in problems %}
+        <tr>
+            <td class="{{ problem['status'] }}"><a href="{{ url_for('problem', problemid=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+            <td>
+                {% for submission in problem['submissions'] %}
+                <a class="{{ submission['submissionstatus'] }}" href="{{ url_for('submission', id=submission['submissionid'], _external=True, _scheme='https') }}">{{ submission['submissiondate'].strftime('%d/%m %H:%M') }}</a>, 
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Submissions</h2>
+    <table class="realtable submissions">
+        <tr class="tableheader">
+            <td>Problem</td>
+            <td>Date</td>
+            <td>Full submission</td>
+            <td>Status</td>
+            <td>CPU</td>
+        </tr>
+    {% for submission in submissions %}
+        <tr>
+            <td><a href="{{ url_for('problem', problemid=submission['problemid'], _external=True, _scheme='https') }}">{{ submission['problemtitle'] }}</a></td>
+            <td class="submissiondate">{{ submission["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td class="submissionlink"><a href="{{ url_for('submission', id=submission['submissionid'], _external=True, _scheme='https')  }}">View submission</a></td>
+            <td class="submissionstatus {{ submission['submissionstatus'] }}">{{ submission["submissionstatus"] }}</td>
+            <td class="submissiontime">{{ submission["executiontime"] }}</td>
+        </tr>
+    {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}
+        

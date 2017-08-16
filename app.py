@@ -903,8 +903,61 @@ def userstats(userid):
     if not is_admin():
         return abort(404)
     # list all solved problems and all unsolved
-    # show count
-    return "userstats"
+
+    db = get_db()
+    userscur = db.execute("SELECT * FROM users WHERE userid='" + userid + "'")
+    userslist = userscur.fetchall()
+    if len(userslist) != 1:
+        return abort(404)
+    user = userslist[0]
+
+    # get all submissions
+    # both as a list sorted by date, and processed as problem solved/unsolved
+    submissionscur = db.execute("select * from submissions where userid ='" + userid + "' order by submissiondate DESC")
+    submissions = submissionscur.fetchall()
+
+    realsubmissions = []
+    for submission in submissions:
+        realsubmission = {}
+        realsubmission["submissionlink"] = url_for("submission", id=submission["submissionid"], _external=True, _scheme="https")
+        realsubmission["submissionid"] = submission["submissionid"]
+        realsubmission["problemid"] = submission["problemid"]
+        realsubmission["submissionstatus"] = submission["submissionstatus"]
+        realsubmission["submissiondate"] = submission["submissiondate"]
+        realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], submission["problemid"])
+        realsubmissions.append(realsubmission)
+    submissions = realsubmissions
+
+    problemstatus = {}
+    problemsubmissions = {}
+    for submission in submissions:
+        if submission["problemid"] not in problemstatus:
+            problemstatus[submission["problemid"]] = submission["submissionstatus"]
+            problemsubmissions[submission["problemid"]] = []
+        else:
+            if problemstatus[submission["problemid"]] != "Accepted":
+                problemstatus[submission["problemid"]] = submission["submissionstatus"]
+        problemsubmissions[submission["problemid"]].append(submission)
+
+    problemids = os.listdir(rlpt("problems"))
+    problems = []
+    for problemid in problemids:
+        if problemid.startswith("%"):
+            continue
+        problem = {}
+        problem["problemid"] = problemid
+        problem["problemtitle"] = getproblemtitle(problemid)
+        problem["status"] = "Not Attempted"
+        problem["submissions"] = []
+        if problemid in problemstatus:
+            problem["status"] = problemstatus[problemid]
+            problem["submissions"] = problemsubmissions[problemid]
+            for sub in problemsubmissions[problemid]:
+                sub["problemtitle"] = problem["problemtitle"]
+
+        problems.append(problem)
+
+    return render_template("userstats.html", logged_in=logged_in(), username=get_username(), user=user, submissions=submissions, problems=problems)
 
 
 
