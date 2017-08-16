@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Turings gäng{% endblock %}
+{% block nav_feed %}navbaractive{% endblock %}
+{% block mobile_nav_feed %}navbaractive{% endblock %}
+
+{% block body %}
+
+    <div id="feedbody">
+
+        {% for post in blogposts %}
+
+        <div class="postbody">
+            <h1>{{ post['title'] }}</h1>
+            <div class="postdate">{{ post['date'] }}</div>
+            <div class="postcontent">
+
+                {{ post['content'] | safe }}
+
+            </div>
+            {% if post["hasproblems"] %}
+            <table class="realtable problemtable">
+                <tr class="tableheader">
+                    <td>Problem</td>
+                </tr>
+                {% for problem in post["problems"] %}
+                <tr>
+                    <td class="{{ problem['status'] }}"><a href="{{ url_for('problem', problemid=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            {% if post["hasextraproblems"] %}
+            <table class="realtable problemtable">
+                <tr class="tableheader">
+                    <td>Extraproblem</td>
+                </tr>
+                {% for problem in post["extraproblems"] %}
+                <tr>
+                    <td class="{{ problem['status'] }}"><a href="{{ url_for('problem', problemid=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+
+
+
+{% endblock %} 

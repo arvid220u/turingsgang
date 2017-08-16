@@ -25,9 +25,15 @@ a {
 a:visited {
     color: rgba(59,99,187,1.0);
 }
+.myfilesblankpage p {
+    font-size: 0.9em;
+}
+#nosubmissionsp {
+    font-size: 0.9em;
+}
 
 #myfilesbody {
-    font-family: Merriweather, serif;
+    font-family: Merriweather, sans-serif;
     padding: 1em 2em;
     max-width: 50em;
     margin: auto;
@@ -739,4 +745,29 @@ input:focus {
 
 #aboutbody p {
     font-size: 0.9em;
+}
+
+
+.postbody {
+    font-family: Merriweather, serif;
+    padding: 1em 2em;
+    max-width: 50em;
+    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background-color: rgb(255,255,255);
+    padding-bottom: 2em;
+}
+.postcontent p {
+    font-size: 0.9em;
+}
+.postbody h1 {
+    margin-bottom: 0;
+}
+.postdate {
+    text-align: center;
+    font-size: 0.9em;
+    font-family: "Open Sans", sans-serif;
+    color: rgb(147,161,161);
+    margin: 0.5em 0;
 }

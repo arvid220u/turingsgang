@@ -207,7 +207,7 @@ def signup():
 def home():
     #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
     #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
-    return problemslist()
+    return feed()
 
 @app.route("/problems")
 def problemslist():
@@ -248,7 +248,7 @@ def addextradatatoproblemstatement(problemstatement, problemid):
             continue
 
         # strip for whitespace in identifier part
-        data.lstrip()
+        data = data.lstrip()
 
         if data.startswith("image"):
             # images are identified by %al%image:filename.png%al%
@@ -271,6 +271,48 @@ def addextradatatoproblemstatement(problemstatement, problemid):
     return realproblemstatement
 
         
+def addextradatatoblogpost(problemstatement, problemid):
+    # all extra data is identified by being enclosed in %al% tags
+    # thus, all elements on even indices are raw html code,
+    # while all odd elements constitute some type of extra data
+    problemstatementsplit = problemstatement.split("%al%")
+
+    realproblemstatement = ""
+
+    for index, data in enumerate(problemstatementsplit):
+        # if index is even, just continue
+        if index % 2 == 0:
+            realproblemstatement += data
+            continue
+
+        # strip for whitespace in identifier part
+        data = data.lstrip()
+
+
+        if data.startswith("image"):
+            # images are identified by %al%image:filename.png%al%
+            filenamestring = data.split(":")[1].strip()
+            # add an img tag. add an extra class that is this problems id concatenated with the filename (without extension), for custom styling
+            realproblemstatement += "<img class='blogpostimage " + blogid + filenamestring.split('.')[0].split(' ')[0] + "' src='" + url_for('static', filename='blog/' + blogid + "/" + filenamestring) + "'>"
+
+        elif data.startswith("problemlink"):
+            # problemlink has format problemlink:problemid
+            problemidstring = data.split(":")[1].strip()
+            realproblemstatement += url_for("problem", problemid=problemidstring)
+
+        elif data.startswith("problemtitle"):
+            # formt problemlink:problemtitle
+            problemidstring = data.split(":")[1].strip()
+            realproblemstatement += getproblemtitle(problemidstring)
+
+        elif data.startswith("link"):
+            # format link:selector
+            selectorstring = data.split(":")[1].strip()
+            realproblemstatement += url_for(selectorstring, _external=True, _scheme="https")
+
+
+
+    return realproblemstatement
 
 
 
@@ -363,6 +405,14 @@ def getproblemtitle(problemid):
     problemtitle = problemid
     with open(problemtitlepath) as problemtitlefile:
         problemtitle = problemtitlefile.read()
+    return problemtitle
+
+
+def getblogposttitle(blogid):
+    blogtitlepath = rlpt("blog/" + blogid + "/title.txt")
+    problemtitle = blogid
+    with open(blogtitlepath) as blogtitlefile:
+        problemtitle = blogtitlefile.read()
     return problemtitle
 
 def getrealexecutiontime(extime, status, problemid):
@@ -846,11 +896,6 @@ def compileandrun():
 
 
 
-# FEED
-
-@app.route("/flode")
-def feed():
-    return "this is da feed"
 
 
 
@@ -958,6 +1003,101 @@ def userstats(userid):
         problems.append(problem)
 
     return render_template("userstats.html", logged_in=logged_in(), username=get_username(), user=user, submissions=submissions, problems=problems)
+
+
+
+
+
+
+# FEED
+
+@app.route("/flode")
+def feed():
+    blogids = os.listdir(rlpt("blog"))
+    blogposts = []
+    for blogid in blogids:
+        if blogid.startswith("%"):
+            continue
+        post = {}
+        post["blogid"] = blogid
+        post["title"] = getblogposttitle(blogid)
+
+        statementspath = rlpt("blog/" + blogid + "/content.html")
+        blogstatement = "Tomt inlägg."
+        if os.path.exists(statementspath):
+            # load blog statement
+            with open(statementspath) as statementfile:
+                blogstatement = statementfile.read()
+
+
+        datepath = rlpt("blog/" + blogid + "/date.txt")
+        dat = datetime.now()
+        # load date 
+        with open(datepath) as datefile:
+            datsr = datefile.read()
+            dat = datetime.strptime(datsr, "%Y-%m-%d %H:%M:%S.%f")
+
+        # convert dat to the right format
+        months = ["coolt", "januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
+        post["date"] = str(dat.day) + " " + months[dat.month] + " " + str(dat.year)
+
+        # get problems
+        problempath = rlpt("blog/" + blogid + "/problems.txt")
+        problems = []
+        hasproblems = True
+        with open(problempath) as problemsfile:
+            for line in problemsfile.readlines():
+                if line.startswith("NOPROBLEMS"):
+                    hasproblems = False
+                    break
+                problemid = line.strip("\n")
+                problem = {}
+                problem["problemid"] = problemid
+                problem["problemtitle"] = getproblemtitle(problemid)
+                problem["status"] = "Not Attempted"
+                if logged_in():
+                    # get submission id, date, status
+                    db = get_db()
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    for submission in cur.fetchall():
+                        if problem["status"] != "Accepted":
+                            problem["status"] = submission["submissionstatus"]
+                problems.append(problem)
+        extraproblempath = rlpt("blog/" + blogid + "/extraproblems.txt")
+        extraproblems = []
+        hasextraproblems = True
+        with open(extraproblempath) as problemsfile:
+            for line in problemsfile.readlines():
+                if line.startswith("NOEXTRAPROBLEMS"):
+                    hasextraproblems = False
+                    break
+                problemid = line.strip("\n")
+                problem = {}
+                problem["problemid"] = problemid
+                problem["problemtitle"] = getproblemtitle(problemid)
+                problem["status"] = "Not Attempted"
+                if logged_in():
+                    # get submission id, date, status
+                    db = get_db()
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    for submission in cur.fetchall():
+                        if problem["status"] != "Accepted":
+                            problem["status"] = submission["submissionstatus"]
+                extraproblems.append(problem)
+
+        post["problems"] = problems
+        post["hasproblems"] = hasproblems and (len(problems) != 0)
+        post["extraproblems"] = extraproblems
+        post["hasextraproblems"] = hasextraproblems and (len(extraproblems) != 0)
+
+        # maybe add images to the problem statement
+        blogstatement = addextradatatoblogpost(blogstatement, blogid)
+
+        post["content"] = blogstatement
+
+        blogposts.append(post)
+
+    return render_template("feed.html", logged_in=logged_in(), username=get_username(), blogposts=blogposts)
 
 
 
