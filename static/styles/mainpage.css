@@ -335,6 +335,11 @@ table.samples td {
     font-family: Merriweather, serif;
     background-color: rgb(255,255,255);
 }
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Open Sans", sans-serif;
+}
+
 h1 {
     text-align: center;
     width: 100%;
@@ -732,4 +737,6 @@ input:focus {
 
 
 
-
+#aboutbody p {
+    font-size: 0.9em;
+}
