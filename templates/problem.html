@@ -63,7 +63,13 @@
         <h2 class="submissionstitle">Submissions</h2>
 
         {% if submissions|length == 0 %}
-            <p>No submissions. Make your first one!</p>
+            <p id="nosubmissionsp">
+            {% if logged_in %}
+            Inga inskickningar. Skicka in en lösning genom att trycka på den gröna Submit-knappen.
+            {% else %}
+                <a href="{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}">Logga in</a> om du vill skicka in en lösning.
+            {% endif %}
+            </p>
         {% else %}
 
             <table class="realtable submissions">
