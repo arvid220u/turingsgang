@@ -18,7 +18,7 @@ Run the app with the command `gunicorn app:app`.
 
 Set up the database by running `sqlite3 app.db < schema.sql`.
 
-The database should be backed up daily. Add `22 4 * * * sqlite3 app.db ".backup app.db.bak"` to `crontab -e`.
+The database should be backed up daily. Add `22 4 * * * sqlite3 /path/to/app.db ".backup /path/to/app.db.bak"` to `crontab -e`.
 
 ### Server
 
