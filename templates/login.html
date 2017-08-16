@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Logga in - Turings gäng{% endblock %}
+{% block loginlink %}{{ url_for('login', _external=True, _scheme='https') }}{% endblock %}
 
 {% block body %}
 <div id="problembody">
@@ -9,14 +10,14 @@
             <div id="infoarea">
                     {% if failedattempt %}
 
-                <label id="faillabel">Wrong username or password!</label>
+                <span id="faillabel">Fel användarnamn eller lösenord!</span>
 
                 {% endif %}
                 {% if signupsuccess %}
-                <label id="infolabel">Signup successful!</label>
+                <span id="infolabel">Du har nu skapat ett konto! Logga in nedan.</span>
                 {% endif %}
                 {% if loginfirstmessage %}
-                <label id="infolabel">You need to log in first.</label>
+                <span id="infolabel">Du måste logga in först.</span>
                 {% endif %}
             </div>
 
@@ -28,18 +29,12 @@
             </script>
 
             <form id="loginform" method="post">
-                <table>
-                    <tr>
-                        <td><label>Username:</label></td>
-                        <td><input type="text" name="username" required></td>
-                    </tr>
-                    <tr>
-                        <td><label>Password:</label></td>
-                        <td><input type="password" name="password" required></td>
-                    </td>
-                </table>
+                <h4>Användarnamn</h4>
+                <input type="text" name="username" required>
+                <h4>Lösenord</h4>
+                <input type="password" name="password" required>
                 <div id="submitrow">
-                    <button type="submit">Login</button>
+                    <button type="submit">Logga in</button>
                 </div>
 
 
@@ -47,9 +42,9 @@
             
             <div id="signuparea">
                 {% if urlfrom == "nourlfrom" %}
-                    <a id="signuplabel" href="{{ url_for('signup') }}">New user? Sign up.</a>
+                    Ny användare? <a id="signuplabel" href="{{ url_for('signup') }}">Skapa konto</a>.
                 {% else %}
-                    <a id="signuplabel" href="{{ url_for('signup', loginfrom=urlfrom) }}">New user? Sign up.</a>
+                    Ny användare? <a id="signuplabel" href="{{ url_for('signup', loginfrom=urlfrom) }}">Skapa konto</a>.
                 {% endif %}
             </div>
 

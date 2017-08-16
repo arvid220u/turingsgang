@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Skapa konto - Turings gäng{% endblock %}
+{% block loginlink %}{{ url_for('login', _external=True, _scheme='https') }}{% endblock %}
 
 {% block body %}
     <div id="problembody">
@@ -10,38 +11,28 @@
             <div id="infoarea">
                 {% if failedattempt %}
 
-                <label id="faillabel">Username already taken!</label>
+                <span id="faillabel">Användarnamn redan upptaget!</span>
 
                 {% endif %}
             </div>
 
             <form id="loginform" method="post">
-                <table>
-                    <tr>
-                        <td><label>Username:</label></td>
-                        <td><input type="text" name="username" required></td>
-                    </tr>
-                    <tr>
-                        <td><label>Email:</label></td>
-                        <td><input type="email" name="email" required></td>
-                    </tr>
-                    <tr>
-                        <td><label>Password:</label></td>
-                        <td><input type="password" id="password" name="password" required></td>
-                    </td>
-                    <tr>
-                        <td><label>Retype password:</label></td>
-                        <td><input type="password" name="passwordconfirmation" required oninput="check(this)"></td>
-                    </td>
-                </table>
+                        <h4>Användarnamn</h4>
+                        <input type="text" name="username" required>
+                        <h4>Email</h4>
+                        <input type="email" name="email" required>
+                        <h4>Lösenord</h4>
+                        <input type="password" id="password" name="password" required>
+                        <h4>Bekräfta lösenord</h4>
+                        <input type="password" name="passwordconfirmation" required oninput="check(this)">
                 <div id="submitrow">
-                    <button type="submit">Sign Up</button>
+                    <button type="submit">Skapa konto</button>
                 </div>
 
                 <script language='javascript' type='text/javascript'>
                     function check(input) {
                         if (input.value != document.getElementById('password').value) {
-                            input.setCustomValidity('Password Must be Matching.');
+                            input.setCustomValidity('Lösenorden måste vara samma.');
                         } else {
                             // input is valid -- reset the error message
                             input.setCustomValidity('');

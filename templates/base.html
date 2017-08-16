@@ -49,7 +49,7 @@
                 {% if logged_in %}
                 <td class="loginrow"><span id="loggedinmessage">{{ username }}</span><br> <a class="logoutlink"href="{{ url_for('logout', from=request.url, _external=True, _scheme='https') }}">Logga ut</a></td>
                 {% else %}
-                    <td class="loginrow"><a class="loginlink" href="{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}">Logga in</a></td>
+                <td class="loginrow {% block nav_login %}{% endblock %}"><a class="loginlink" href="{% block loginlink %}{{ url_for('login', _external=True, _scheme='https', urlfrom=request.url) }}{% endblock %}">Logga in</a></td>
                 {% endif %}
             </tr>
         </table>

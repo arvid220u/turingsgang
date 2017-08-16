@@ -281,8 +281,8 @@ table.samples td {
 }
 
 #loginformcontainer {
-    width: 22em;
-    max-width: 80vw;
+    width: 15em;
+    max-width: calc(100% - 4em);
     margin: auto;
     padding: 1em;
     /*background-color: rgba(0,0,0,0.1);*/
@@ -301,15 +301,48 @@ table.samples td {
     text-align: center;
 }
 
-#loginform label {
-    padding: 1em;
+#loginform h4 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0;
+}
+#loginform input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5em;
+    -webkit-appearance: none;
+}
+#loginform input:focus {
+    border-color: rgb(211, 54, 130);
 }
 #loginform {
-    padding: 1em 0;
+    padding: 0;
 }
+#submitrow button {
+    text-decoration: none;
+    border: none;
+    background-color: rgba(0,0,0,0);
+    font-size: 1em;
+    cursor: pointer;
+    height: 2.2em;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-decoration: none;
+    border-radius: 0.3em;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
+    outline: none;
+    /*background-color: rgba(59,187,99,1.0);
+    background-color: rgba(11,100,62,1.0);*/
+    background-color: rgba(61,187,71,1.0);
+    color: white;
+    text-align: center;
+}
+
 #submitrow {
     text-align: center;
-    padding-top: 1em;
+    padding: 1.5em 0;
 }
 #faillabel {
     text-align: center;
@@ -664,10 +697,10 @@ input {
     padding: 0.3em;
     outline: none;
     border-radius: 3px;
-    border-color: rgb(161,183,191);
+    border-color: rgb(151,173,191);
 }
 input:focus {
-    border-color: rgb(7, 158, 163);
+    border-color: rgb(211, 54, 130);
 }
 
 
