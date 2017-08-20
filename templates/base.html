@@ -8,7 +8,25 @@
     <link href="{{ url_for('static',filename='styles/mainpage.css') }}" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Inconsolata:700|Merriweather|Open+Sans:400,600" rel="stylesheet">
 
-    {% block viewport %}<meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />{% endblock %}
+
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='icon/apple-touch-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='icon/apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='icon/apple-touch-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='icon/apple-touch-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='icon/apple-touch-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='icon/apple-touch-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='icon/apple-touch-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='icon/apple-touch-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icon/apple-touch-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon/favicon-196x196.png') }}" sizes="196x196">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon/favicon-96x96.png') }}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon/favicon-32x32.png') }}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon/favicon-16x16.png') }}" sizes="16x16">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon/favicon-128.png') }}" sizes="128x128">
+
+
+
+    {% block viewport %}<meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0">{% endblock %}
 
     {% macro needsmath() %}
         <script type="text/x-mathjax-config">
@@ -41,7 +59,7 @@
                             <td class="leftnavlink {% block nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
                             <td class="leftnavlink {% block nav_feed %}{% endblock %}"><a href="{{ url_for('feed') }}">Flöde</a></td>
                             <td class="leftnavlink {% block nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Problem</a></td>
-                            <td class="leftnavlink {% block nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
+                            <td class="leftnavlink {% block nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om oss</a></td>
                         </tr>
                     </table>
                 </td>
@@ -58,7 +76,7 @@
                             <td class="mobileleftnavlink mobileleftnavlinkleftest {% block mobile_nav_editor %}{% endblock %}"><a href="{{ url_for('editor') }}">Editor</a></td>
                             <td class="mobileleftnavlink {% block mobile_nav_feed %}{% endblock %}"><a href="{{ url_for('feed') }}">Flöde</a></td>
                             <td class="mobileleftnavlink {% block mobile_nav_problemslist %}{% endblock %}"><a href="{{ url_for('problemslist') }}">Problem</a></td>
-                            <td class="mobileleftnavlink mobileleftnavlinkrightest {% block mobile_nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om</a></td>
+                            <td class="mobileleftnavlink mobileleftnavlinkrightest {% block mobile_nav_about %}{% endblock %}"><a href="{{ url_for('about') }}">Om oss</a></td>
                         </tr>
                     </table>
     </nav>
