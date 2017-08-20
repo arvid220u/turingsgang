@@ -205,9 +205,9 @@ def signup():
 
 @app.route("/")
 def home():
-    #return redirect(url_for("file?id=" + binascii.b2a_hex(os.urandom(15)).decode("utf-8"), scheme="https"))
-    #return redirect(url_for("loadfile", id=binascii.b2a_hex(os.urandom(15)).decode("utf-8"), _external=True, _scheme="https"))
-    return feed()
+
+    return render_template("home.html", logged_in=logged_in(), username=get_username())
+
 
 @app.route("/problems")
 def problemslist():

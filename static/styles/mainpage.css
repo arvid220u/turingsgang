@@ -15,6 +15,9 @@ button {
     background-color: white;
     padding: 0;
 }
+.bodyhome {
+    background-color: white;
+}
 
 
 
@@ -745,7 +748,88 @@ input:focus {
 
 
 /* mobile! */
-@media (max-width: 700px) {
+
+
+#aboutbody p {
+    font-size: 0.9em;
+}
+
+
+.postbody {
+    font-family: Merriweather, serif;
+    padding: 1em 2em;
+    max-width: 50em;
+    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background-color: rgb(255,255,255);
+    padding-bottom: 2em;
+}
+.postcontent p {
+    font-size: 0.9em;
+}
+.postbody h1 {
+    margin-bottom: 0;
+}
+.postdate {
+    text-align: center;
+    font-size: 0.9em;
+    font-family: "Open Sans", sans-serif;
+    color: rgb(147,161,161);
+    margin: 0.5em 0;
+}
+
+
+
+
+#homemaindiv {
+    font-family: "Open Sans";
+    padding: 1em 2em;
+    padding-top: 0;
+    max-width: 40em;
+    margin: auto;
+    margin-top: 0;
+    background-color: rgb(255,255,255);
+    padding-bottom: 2em;
+}
+#homemaindiv h1 {
+    font-family: Inconsolata, mono-space;
+    font-size: 2.5em;
+}
+#homemaindiv .question {
+    color: rgb(70,87,92);
+}
+#homemaindiv .turkos {
+    color: rgb(7,158,163);
+}
+#homemaindiv .answer {
+    color: rgb(224,83,24);
+}
+#homemaindiv #introinfo {
+    margin-top: 2em;
+    font-size: 1.2em;
+    line-height: 180%;
+}
+#homemaindiv #extrainfo {
+    font-size: 1.2em;
+    line-height: 180%;
+}
+#homemaindiv #signupturingsgang {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+#homemaindiv #signupturingsgang a {
+    color: rgb(211,54,130);
+}
+
+
+
+
+@media (max-width: 780px) {
+    #homemaindiv h1 {
+        font-size: 2em;
+    }
     .centernavigationtablerow {
         display: none;
     }
@@ -783,33 +867,3 @@ input:focus {
 }
 
 
-
-
-#aboutbody p {
-    font-size: 0.9em;
-}
-
-
-.postbody {
-    font-family: Merriweather, serif;
-    padding: 1em 2em;
-    max-width: 50em;
-    margin: auto;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    background-color: rgb(255,255,255);
-    padding-bottom: 2em;
-}
-.postcontent p {
-    font-size: 0.9em;
-}
-.postbody h1 {
-    margin-bottom: 0;
-}
-.postdate {
-    text-align: center;
-    font-size: 0.9em;
-    font-family: "Open Sans", sans-serif;
-    color: rgb(147,161,161);
-    margin: 0.5em 0;
-}

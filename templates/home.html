@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Turings gäng{% endblock %}
+
+{% block bodyid %}bodyhome{% endblock %}
+
+{% block body %}
+
+<div id="homemaindiv">
+
+    <h1 class="question">Intresserad av <span class="turkos">problemlösning</span>?</h1>
+    <h1 class="question">Nyfiken på <span class="turkos">programmering</span>?</h1>
+    <h1 class="answer">Gå med i Turings gäng!</h1>
+
+    <div id="introinfo">
+        <p>
+        Välkommen på introduktionsträff <b>tisdag 29 augusti kl. 18.30</b> på <b>Malmö Borgarskola</b>.
+        </p>
+        <p>
+        Vi bjuder på fika! Både föräldrar och elever är välkomna.
+        </p>
+        <div id="signupturingsgang">
+        <a target="_blank" href="https://goo.gl/forms/fXwXn9Y51zCi3F703">Anmäl dig här.</a>
+        </div>
+    </div>
+    <div id="extrainfo">
+        <p>
+        Turings gäng träffas varje <b>torsdag kl. 16.00 - 17.00</b> på <b>Malmö Borgarskola</b>, med start <b>7 september</b>.
+        Vi riktar oss främst till dig som är elev i årskurs 7, 8 eller 9. <a href="{{ url_for('about', _external=True, _scheme='https') }}">Läs mer om oss här.</a>
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}
