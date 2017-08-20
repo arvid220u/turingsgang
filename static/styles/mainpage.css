@@ -532,6 +532,13 @@ img.problemstatementimage {
     display: block;
 }
 
+img#aboutimage {
+    max-width: 100%;
+    width: 30em;
+    margin: 2em auto;
+    display: block;
+}
+
 blockquote {
     color: rgb(100,100,100);
     border-left: solid 0.2em;
@@ -764,8 +771,10 @@ input:focus {
         text-align: center;
         padding-bottom: 0.8em;
         padding-top: 0.3em;
-        padding-left: 0.9em;
-        padding-right: 1.5em;
+        /*padding-left: 0.9em;
+        padding-right: 1.5em;*/
+        padding-left: 1em;
+        padding-right: 1em;
     }
     .mobileleftnavlink {
         text-align: center;
