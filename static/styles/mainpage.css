@@ -786,7 +786,7 @@ input:focus {
     font-family: "Open Sans";
     padding: 1em 2em;
     padding-top: 0;
-    max-width: 40em;
+    max-width: 55em;
     margin: auto;
     margin-top: 0;
     background-color: rgb(255,255,255);
@@ -809,10 +809,12 @@ input:focus {
     margin-top: 2em;
     font-size: 1.2em;
     line-height: 180%;
+    text-align: center;
 }
 #homemaindiv #extrainfo {
     font-size: 1.2em;
     line-height: 180%;
+    text-align: center;
 }
 #homemaindiv #signupturingsgang {
     text-align: center;
