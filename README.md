@@ -8,10 +8,12 @@ Rename the `config_template.py` file to `config.py` and enter all relevant confi
 Use a `virtualenv`. (Install with `pip3 install virtualenv`. Create a `virtualenv` in the project directory using `virtualenv judgevenv`. Activate using `source judgevenv/bin/activate`.)
 
 Use with Nginx in production. See https://blog.marksteve.com/deploy-a-flask-application-inside-a-digitalocean-droplet/. Append the following to `/etc/nginx/conf.d/flask-app.conf` if you want to redirect www to non-www (which is highly advisable): 
-```server {
+```
+server {
     server_name www.matteklubbenfibonacci.se;
     return 301 https://matteklubbenfibonacci.se$request_uri;
-}```
+}
+```
 
 SSL is good. Read https://certbot.eff.org. Use the following cron job for automatic renewal: `43 1,13 * * * certbot renew --post-hook "service nginx reload"` (after running `crontab -e`).
 
