@@ -310,6 +310,11 @@ def addextradatatoblogpost(problemstatement, problemid):
             selectorstring = data.split(":")[1].strip()
             realproblemstatement += url_for(selectorstring, _external=True, _scheme="https")
 
+        elif data.startswith("staticlink"):
+            # format link:path
+            selectorstring = data.split(":")[1].strip()
+            realproblemstatement += url_for("static", filename=selectorstring, _external=True, _scheme="https")
+
 
 
     return realproblemstatement
@@ -1034,8 +1039,9 @@ def feed():
         dat = datetime.now()
         # load date 
         with open(datepath) as datefile:
-            datsr = datefile.read()
+            datsr = datefile.read().strip()
             dat = datetime.strptime(datsr, "%Y-%m-%d %H:%M:%S.%f")
+            post["realdate"] = dat
 
         # convert dat to the right format
         months = ["coolt", "januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
@@ -1096,6 +1102,11 @@ def feed():
         post["content"] = blogstatement
 
         blogposts.append(post)
+
+    # sort by date
+    blogposts = sorted(blogposts, key=lambda k: k["realdate"], reverse=True)
+    for b in blogposts:
+        b.pop("realdate", None)
 
     return render_template("feed.html", logged_in=logged_in(), username=get_username(), blogposts=blogposts)
 
