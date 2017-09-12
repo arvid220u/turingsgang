@@ -765,7 +765,7 @@ input:focus {
     background-color: rgb(255,255,255);
     padding-bottom: 2em;
 }
-.postcontent p {
+.postcontent {
     font-size: 0.9em;
 }
 .postbody h1 {
@@ -810,6 +810,9 @@ input:focus {
     font-size: 1.2em;
     line-height: 180%;
     text-align: center;
+}
+.nomoreinfo {
+    margin-top: 3em !important;
 }
 #homemaindiv #extrainfo {
     font-size: 1.2em;
