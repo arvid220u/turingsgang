@@ -685,11 +685,11 @@ def newfile():
 
     filename = "Namnlös fil"
     # make sure filename is unique
-    filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "'")
+    filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "' AND userid = '" + user_id() + "'")
     filecount = 2
     while filenamecur.fetchone()[0] != 0:
         filename = "Namnlös fil "  + str(filecount)
-        filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "'")
+        filenamecur = db.execute("SELECT COUNT(1) from files WHERE filename ='" + filename + "' AND userid = '" + user_id() + "'")
         filecount += 1
 
     db.execute("INSERT into files (fileid, userid, creationdate, lastupdateddate, filename) values (?, ?, ?, ?, ?)", (fileid, user_id(), datetime.now(), datetime.now(), filename))
