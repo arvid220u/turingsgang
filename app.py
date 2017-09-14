@@ -919,6 +919,13 @@ def is_admin():
     return (get_username() == "arvid220u" or get_username() == "Teodor Bucht")
 
 
+def get_students():
+    db = get_db()
+    allstudentscur = db.execute("SELECT * FROM users WHERE groupstatus = 'student'")
+    allstudents = allstudentscur.fetchall()
+    return allstudents
+
+
 
 # control panel, only for arvid220u and teodor bucht
 @app.route("/controlpanel")
@@ -933,10 +940,11 @@ def controlpanel():
     db = get_db()
     alluserscur = db.execute("SELECT * FROM users")
     allusers = alluserscur.fetchall()
-    hej = """
+
+    allstudents = get_students()
     # get all assignments
     blogids = os.listdir(rlpt("blog"))
-    blogposts = []
+    assignments = []
     for blogid in blogids:
         if blogid.startswith("%"):
             continue
@@ -965,14 +973,16 @@ def controlpanel():
                 problem = {}
                 problem["problemid"] = problemid
                 problem["problemtitle"] = getproblemtitle(problemid)
-                problem["status"] = "Not Attempted"
-                if logged_in():
+                problem["studentstatus"] = {}
+                for student in allstudents:
                     # get submission id, date, status
                     db = get_db()
-                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    disstat = "Not Attempted"
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + student["userid"] + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
                     for submission in cur.fetchall():
-                        if problem["status"] != "Accepted":
-                            problem["status"] = submission["submissionstatus"]
+                        if disstat != "Accepted":
+                            disstat = submission["submissionstatus"]
+                    problem["studentstatus"][student["userid"]] = disstat
                 problems.append(problem)
         extraproblempath = rlpt("blog/" + blogid + "/extraproblems.txt")
         extraproblems = []
@@ -986,23 +996,31 @@ def controlpanel():
                 problem = {}
                 problem["problemid"] = problemid
                 problem["problemtitle"] = getproblemtitle(problemid)
-                problem["status"] = "Not Attempted"
-                if logged_in():
+                problem["studentstatus"] = {}
+                for student in allstudents:
                     # get submission id, date, status
                     db = get_db()
-                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    disstat = "Not Attempted"
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + student["userid"] + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
                     for submission in cur.fetchall():
-                        if problem["status"] != "Accepted":
-                            problem["status"] = submission["submissionstatus"]
+                        if disstat != "Accepted":
+                            disstat = submission["submissionstatus"]
+                    problem["studentstatus"][student["userid"]] = disstat
                 extraproblems.append(problem)
 
         post["problems"] = problems
         post["hasproblems"] = hasproblems and (len(problems) != 0)
         post["extraproblems"] = extraproblems
         post["hasextraproblems"] = hasextraproblems and (len(extraproblems) != 0)
-"""
+        if hasextraproblems or hasproblems:
+            assignments.append(post)
 
-    return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers)
+    # sort by date
+    assignments = sorted(assignments, key=lambda k: k["realdate"], reverse=True)
+    for assig in assignments:
+        assig.pop("realdate", None)
+
+    return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers, assignments=assignments, allstudents=allstudents)
 
 @app.route("/deleteuser", methods=["GET"])
 def deleteuser():
