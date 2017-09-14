@@ -918,6 +918,8 @@ def about():
 def is_admin():
     return (get_username() == "arvid220u" or get_username() == "Teodor Bucht")
 
+
+
 # control panel, only for arvid220u and teodor bucht
 @app.route("/controlpanel")
 def controlpanel():
@@ -931,9 +933,118 @@ def controlpanel():
     db = get_db()
     alluserscur = db.execute("SELECT * FROM users")
     allusers = alluserscur.fetchall()
+    hej = """
+    # get all assignments
+    blogids = os.listdir(rlpt("blog"))
+    blogposts = []
+    for blogid in blogids:
+        if blogid.startswith("%"):
+            continue
+        post = {}
+        post["blogid"] = blogid
+        post["title"] = getblogposttitle(blogid)
+
+        datepath = rlpt("blog/" + blogid + "/date.txt")
+        dat = datetime.now()
+        # load date 
+        with open(datepath) as datefile:
+            datsr = datefile.read().strip()
+            dat = datetime.strptime(datsr, "%Y-%m-%d %H:%M:%S.%f")
+            post["realdate"] = dat
+
+        # get problems
+        problempath = rlpt("blog/" + blogid + "/problems.txt")
+        problems = []
+        hasproblems = True
+        with open(problempath) as problemsfile:
+            for line in problemsfile.readlines():
+                if line.startswith("NOPROBLEMS"):
+                    hasproblems = False
+                    break
+                problemid = line.strip("\n")
+                problem = {}
+                problem["problemid"] = problemid
+                problem["problemtitle"] = getproblemtitle(problemid)
+                problem["status"] = "Not Attempted"
+                if logged_in():
+                    # get submission id, date, status
+                    db = get_db()
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    for submission in cur.fetchall():
+                        if problem["status"] != "Accepted":
+                            problem["status"] = submission["submissionstatus"]
+                problems.append(problem)
+        extraproblempath = rlpt("blog/" + blogid + "/extraproblems.txt")
+        extraproblems = []
+        hasextraproblems = True
+        with open(extraproblempath) as problemsfile:
+            for line in problemsfile.readlines():
+                if line.startswith("NOEXTRAPROBLEMS"):
+                    hasextraproblems = False
+                    break
+                problemid = line.strip("\n")
+                problem = {}
+                problem["problemid"] = problemid
+                problem["problemtitle"] = getproblemtitle(problemid)
+                problem["status"] = "Not Attempted"
+                if logged_in():
+                    # get submission id, date, status
+                    db = get_db()
+                    cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                    for submission in cur.fetchall():
+                        if problem["status"] != "Accepted":
+                            problem["status"] = submission["submissionstatus"]
+                extraproblems.append(problem)
+
+        post["problems"] = problems
+        post["hasproblems"] = hasproblems and (len(problems) != 0)
+        post["extraproblems"] = extraproblems
+        post["hasextraproblems"] = hasextraproblems and (len(extraproblems) != 0)
+"""
 
     return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers)
 
+@app.route("/deleteuser", methods=["GET"])
+def deleteuser():
+    if not is_admin():
+        abort(404)
+
+    userid = request.args["userid"]
+
+    db = get_db()
+    filecur = db.execute("SELECT * FROM users WHERE userid ='" + userid + "'")
+    results = filecur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+    thisuser = results[0]
+
+    # remove the user from the database, and all its associated files and submissions
+    db.execute("DELETE FROM users WHERE userid ='" + userid + "'")
+    db.execute("DELETE FROM files WHERE userid ='" + userid + "'")
+    db.execute("DELETE FROM submissions WHERE userid ='" + userid + "'")
+    db.commit()
+
+    return redirect(url_for('controlpanel', _external=True, _scheme="https"))
+
+@app.route("/elevateuser", methods=["GET"])
+def elevateuser():
+    if not is_admin():
+        abort(404)
+
+    userid = request.args["userid"]
+
+    db = get_db()
+    filecur = db.execute("SELECT * FROM users WHERE userid ='" + userid + "'")
+    results = filecur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+    thisuser = results[0]
+
+    # elevate the user to be a student
+    db.execute("UPDATE users SET groupstatus = 'student' WHERE userid ='" + userid + "'")
+    db.commit()
+
+    return redirect(url_for('controlpanel', _external=True, _scheme="https"))
 
 
 @app.route("/problemstats/<problemid>")

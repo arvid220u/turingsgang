@@ -14,12 +14,16 @@
             <td>Username</td>
             <td>Email</td>
             <td>Group</td>
+            <td>Elevate</td>
+            <td>Radera</td>
         </tr>
         {% for user in allusers %}
         <tr>
             <td><a href="{{ url_for('userstats', userid=user['userid'], _external=True, _scheme='https') }}">{{ user['username'] }}</a></td>
             <td>{{ user['email'] }}</td>
             <td>{{ user['groupstatus'] }}</td>
+            <td class="elevateusercell"><a href="{{ url_for('elevateuser', userid=user['userid'], _external=True, _scheme='https') }}">Elevate</a></td>
+            <td class="removefilecell"><a onclick="return confirm('Vill du verkligen radera {{ user['username'] }}?');" href="{{ url_for('deleteuser', userid=user['userid'], _external=True, _scheme='https') }}">Radera</a></td>
         </tr>
         {% endfor %}
     </table>
