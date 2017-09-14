@@ -74,6 +74,9 @@ a:visited {
 .statementparagraph {
     font-size: 0.9em;
 }
+.statementparagraph code {
+    font-size: 1.3em;
+}
 #problemtitle {
     font-size: 2.5em;
     text-align: center;
