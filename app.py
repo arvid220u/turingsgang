@@ -182,6 +182,12 @@ def signup():
         if usernamecount != 0:
             return render_template("signup.html", failedattempt = True)
 
+        # make sure email is unique
+        emailcur = db.execute("SELECT COUNT(1) from users WHERE email ='" + email + "'") 
+        emailcount = emailcur.fetchone()[0]
+        if emailcount != 0:
+            return render_template("signup.html", failedemail = True)
+
         # make sure userid is unique
         useridcur = db.execute("SELECT COUNT(1) from users WHERE userid ='" + userid + "'")
         while useridcur.fetchone()[0] != 0:
