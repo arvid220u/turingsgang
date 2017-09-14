@@ -6,20 +6,28 @@
     <div id="problembody">
 
 
+
+        <h1 class="loginheader">
+            Skapa ett konto
+        </h1>
+
+        <div id="infoarea">
+            {% if failedattempt %}
+
+            <span id="faillabel">Användarnamnet är redan upptaget!</span>
+
+            {% endif %}
+            {% if failedemail %}
+            <span id="faillabel">E-postadressen är redan upptagen!</span>
+            {% endif %}
+        </div>
+
         <div id="loginformcontainer">
-
-            <div id="infoarea">
-                {% if failedattempt %}
-
-                <span id="faillabel">Användarnamn redan upptaget!</span>
-
-                {% endif %}
-            </div>
 
             <form id="loginform" method="post">
                         <h4>Användarnamn</h4>
                         <input type="text" name="username" required>
-                        <h4>Email</h4>
+                        <h4>E-postadress</h4>
                         <input type="email" name="email" required>
                         <h4>Lösenord</h4>
                         <input type="password" id="password" name="password" required>

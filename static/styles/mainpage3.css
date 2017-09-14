@@ -291,6 +291,7 @@ table.samples td {
     max-width: calc(100% - 4em);
     margin: auto;
     padding: 1em;
+    padding-top: 0;
     /*background-color: rgba(0,0,0,0.1);*/
     font-family: "Open Sans", sans-serif;
 }
@@ -299,12 +300,20 @@ table.samples td {
 }
 #faillabel {
     color: red;
+    display: block;
+    padding-bottom: 0.5em;
+    padding-top: 0;
+    margin-top: 0;
 }
 #signuparea {
     text-align: center;
 }
+h1.loginheader {
+    margin-bottom: 0.7em;
+}
 #infoarea {
     text-align: center;
+    font-family: "Open Sans", sans-serif;
 }
 
 #loginform h4 {

@@ -5,22 +5,25 @@
 {% block body %}
 <div id="problembody">
 
+        <h1 class="loginheader">
+            Logga in
+        </h1>
+
+        <div id="infoarea">
+            {% if failedattempt %}
+
+            <span id="faillabel">Fel användarnamn eller lösenord!</span>
+
+            {% endif %}
+            {% if signupsuccess %}
+            <span id="infolabel">Du har nu skapat ett konto! Logga in nedan.</span>
+            {% endif %}
+            {% if loginfirstmessage %}
+            <span id="infolabel">Du måste logga in först.</span>
+            {% endif %}
+        </div>
 
         <div id="loginformcontainer">
-            <div id="infoarea">
-                    {% if failedattempt %}
-
-                <span id="faillabel">Fel användarnamn eller lösenord!</span>
-
-                {% endif %}
-                {% if signupsuccess %}
-                <span id="infolabel">Du har nu skapat ett konto! Logga in nedan.</span>
-                {% endif %}
-                {% if loginfirstmessage %}
-                <span id="infolabel">Du måste logga in först.</span>
-                {% endif %}
-            </div>
-
             <script>
                 
                 var current_url = window.location.href;
