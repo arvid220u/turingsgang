@@ -543,6 +543,8 @@ def grade(problemid, submissionid, submissiontext):
     status = ""
 
     # compile the file to the exfile
+    # popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # compileoutput, compileerror = popn.communicate()
     try:
         subprocess.call(["g++", "-std=c++11", "-static", "-O2", "-o", exfilename, filename])
     except Exception as exception:
