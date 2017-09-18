@@ -499,7 +499,7 @@ h1 {
 #submissioninfo .Accepted, .submissions .Accepted, #controlpanelbody .Accepted {
     color: rgba(61,187,71,1.0);
 }
-.Wrong.Answer, .Time.Limit.Exceeded, .Runtime.Error, .Compile.Error {
+.Wrong.Answer, .Time.Limit.Exceeded, .Runtime.Error, .Run.Time.Error, .Compile.Error {
     color: rgba(239,17,29,1.0);
 }
 .Running {

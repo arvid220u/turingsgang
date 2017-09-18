@@ -636,7 +636,7 @@ def grade(problemid, submissionid, submissiontext):
                     shouldbreak = True
                     executiontime = -1
                 except Exception as exception:
-                    status = "Runtime Error"
+                    status = "Run Time Error"
                     shouldbreak = True
                 if shouldbreak: break
                 # rstrip so that users don't have to end with newlines
