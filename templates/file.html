@@ -88,7 +88,7 @@ function selectall(inputfield) {
                         document.getElementById("editoroutput").value = "";
                         if ("runtimeerror" in fullresponse) {
                             document.getElementById("editorerrormessage").innerHTML = fullresponse["runtimeerror"];
-                            document.getElementById("editorerrormessage").style.display = "none";
+                            document.getElementById("editorerrormessage").style.display = "block";
                         }
                         if ("compileerror" in fullresponse) {
                             document.getElementById("editorerrormessage").innerHTML = fullresponse["compileerror"];
