@@ -926,7 +926,7 @@ def compileandrun():
             endtime = time.time()
             returndata["executiontime"] = "{:.2f}".format(endtime - starttime) + " s"
             if result.stderr.decode("utf-8") != "":
-                returndata["runtimeerror"] = result.stderr.decode("utf-8").replace(compiledfilename, "")
+                returndata["runtimeerror"] = result.stderr.decode("utf-8").replace(compiledfilename, "").replace(exfilename, "").replace("=================================================================", "============================")
             result.check_returncode()
             output = result.stdout.decode("utf-8")
     except subprocess.TimeoutExpired as timeoutexception:
