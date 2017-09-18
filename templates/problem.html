@@ -33,6 +33,12 @@
                     <button type="submit" id="submitbutton">Submit</button>
                 </form>
 
+                {% if hassolved %}
+
+                <div id="problemlosningsforslag"><a href="{{ url_for("solution", problemid=problemid) }}">Lösningsförslag</a></div>
+
+                {% endif %}
+
             </div>
             <hr id="problemheaderseparator">
 
