@@ -122,11 +122,11 @@ def login():
     if logged_in():
         return redirect(url_for('home', _external=True, _scheme="https"))
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email'].lower()
         passwordhash = md5(request.form["password"].encode("utf-8")).hexdigest()
         print("passwordhash: " + passwordhash)
         db = get_db()
-        cur = db.execute("SELECT * FROM users WHERE username = '" + username + "' AND passwordhash = '" + passwordhash + "'")
+        cur = db.execute("SELECT * FROM users WHERE email = '" + email + "' AND passwordhash = '" + passwordhash + "'")
         curlist = cur.fetchall()
         if len(curlist) == 0:
             return render_template("login.html", failedattempt = True)
@@ -134,6 +134,7 @@ def login():
         session["userid"] = user["userid"]
         if "urlfrom" in request.args:
             return redirect(httpsify(request.args["urlfrom"]))
+        # redirect to home
         return redirect(url_for('home', _external=True, _scheme="https"))
     signupsuccess = False
     if "s" in request.args:
@@ -168,10 +169,10 @@ def signup():
     if request.method == 'POST':
 
         # get all necessary details
-        username = request.form['username']
+        username = request.form['anvandnamn']
         passwordhash = md5(request.form["password"].encode("utf-8")).hexdigest()
         print("passwordhash: " + passwordhash)
-        email = request.form['email']
+        email = request.form['email'].lower()
         userid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
 
         db = get_db()
@@ -211,7 +212,9 @@ def signup():
 
 @app.route("/")
 def home():
-
+    # if logged in, redirect to feed
+    if logged_in():
+        return redirect(url_for("feed"))
     return render_template("home.html", logged_in=logged_in(), username=get_username())
 
 
@@ -221,7 +224,7 @@ def problemslist():
     problemids = os.listdir(rlpt("problems"))
     problems = []
     for problemid in problemids:
-        if problemid.startswith("%"):
+        if problemid.startswith("0"):
             continue
         problem = {}
         problem["problemid"] = problemid
@@ -259,8 +262,10 @@ def addextradatatoproblemstatement(problemstatement, problemid):
         if data.startswith("image"):
             # images are identified by %al%image:filename.png%al%
             filenamestring = data.split(":")[1].strip()
-            # add an img tag. add an extra class that is this problems id concatenated with the filename (without extension), for custom styling
-            realproblemstatement += "<img class='problemstatementimage " + problemid + filenamestring.split('.')[0].split(' ')[0] + "' src='" + url_for('static', filename='problems/' + problemid + "/" + filenamestring) + "'>"
+            # add an img tag. ainitialodd an extra class that is this problems id concatenated with the filename (without extension), for custom styling
+            # strip problem id of leading zeroes
+            stripproblemid = problemid.lstrip("0")
+            realproblemstatement += "<img class='problemstatementimage " + stripproblemid + filenamestring.split('.')[0].split(' ')[0] + "' src='" + url_for('static', filename='problems/' + stripproblemid + "/" + filenamestring) + "'>"
 
         elif data.startswith("problemlink"):
             # problemlink has format problemlink:problemid
@@ -897,6 +902,8 @@ def compileandrun():
     except Exception as exception:
         os.remove(infilename)
         returndata["success"] = False
+        #returndata["compileerror"] = str(exception)
+        print(str(exception))
         return json.dumps(returndata)
 
     # remove temporary files
