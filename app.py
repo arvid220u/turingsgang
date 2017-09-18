@@ -374,6 +374,7 @@ def problem(problemid):
                 samples.append(sampledict)
         # check if logged in
         submissions = []
+        hassolved = False
         if logged_in():
             # get submission id, date, status
             db = get_db()
@@ -382,6 +383,8 @@ def problem(problemid):
                 realsubmission = {}
                 realsubmission["submissionlink"] = url_for("submission", id=submission["submissionid"], _external=True, _scheme="https")
                 realsubmission["submissionstatus"] = submission["submissionstatus"]
+                if submission["submissionstatus"] == "Accepted":
+                    hassolved = True
                 realsubmission["submissiondate"] = submission["submissiondate"]
                 realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], problemid)
                 submissions.append(realsubmission)
@@ -389,7 +392,7 @@ def problem(problemid):
         timelimit = "{:.0f}".format(gettimelimit(problemid)) + " sekund"
         if gettimelimit(problemid) != 1:
             timelimit += "er"
-        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits, problemtitle=getproblemtitle(problemid), timelimit=timelimit)
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits, problemtitle=getproblemtitle(problemid), timelimit=timelimit, hassolved=hassolved)
     else:
         return abort(404)
 
@@ -418,6 +421,35 @@ def submission():
     
     return render_template("submission.html", problemid=problemid, problemtitle = problemtitle, submissionusername=get_username(userid = result["userid"]), submissiondate=result["submissiondate"], submissiontext=html.escape(result["submissiontext"]), submissionstatus=result["submissionstatus"], logged_in=logged_in(), username = get_username(), executiontime = executiontime)
 
+
+@app.route("/problems/<problemid>/losningsforslag", methods=["GET"])
+def solution(problemid):
+    if not logged_in():
+        return abort(404)
+    #return render_template("submission.html")
+    #return getsubmissionstatus(request.args["id"])
+    solutionpath = rlpt("problems/" + problemid + "/solution.cpp")
+    if not os.path.exists(solutionpath):
+        return abort(404)
+
+    # check if solved
+    db = get_db()
+    cur = db.execute("SELECT submissionstatus FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate DESC")
+    hassolved = False
+    for submission in cur.fetchall():
+        if submission["submissionstatus"] == "Accepted":
+            hassolved = True
+    if not hassolved:
+        return abort(404)
+    
+    problemtitle = getproblemtitle(problemid)
+
+    solutioncontent = ""
+    with open(solutionpath, "r") as solutionfile:
+        solutioncontent = solutionfile.read()
+    solutioncontent = html.escape(solutioncontent)
+    
+    return render_template("solution.html", problemid=problemid, problemtitle = problemtitle, logged_in=logged_in(), username = get_username(), submissiontext = solutioncontent)
 
 
 def getproblemtitle(problemid):
