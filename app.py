@@ -385,7 +385,11 @@ def problem(problemid):
                 realsubmission["submissiondate"] = submission["submissiondate"]
                 realsubmission["executiontime"] = getrealexecutiontime(submission["executiontime"], submission["submissionstatus"], problemid)
                 submissions.append(realsubmission)
-        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits, problemtitle=getproblemtitle(problemid))
+        # get time limit (as a string)
+        timelimit = "{:.0f}".format(gettimelimit(problemid)) + " sekund"
+        if gettimelimit(problemid) != 1:
+            timelimit += "er"
+        return render_template("problem.html", problemid=problemid, problemstatement=problemstatement, submissions=submissions, samples=samples, logged_in=logged_in(), username=get_username(), problemcredits = problemcredits, problemtitle=getproblemtitle(problemid), timelimit=timelimit)
     else:
         return abort(404)
 
