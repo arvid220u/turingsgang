@@ -8,6 +8,9 @@
 
 
         <h1>Submission</h1>
+        {% if is_admin %}
+        <div id="problemlosningsforslag"><a href="{{ url_for("rejudge", submissionid=submissionid) }}">Rejudge</a></div>
+        {% endif %}
         
         <table id="submissioninfo" class="realtable">
             <tr class="tableheader">

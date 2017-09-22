@@ -419,8 +419,22 @@ def submission():
 
     executiontime = getrealexecutiontime(result["executiontime"], result["submissionstatus"], problemid)
     
-    return render_template("submission.html", problemid=problemid, problemtitle = problemtitle, submissionusername=get_username(userid = result["userid"]), submissiondate=result["submissiondate"], submissiontext=html.escape(result["submissiontext"]), submissionstatus=result["submissionstatus"], logged_in=logged_in(), username = get_username(), executiontime = executiontime)
+    return render_template("submission.html", problemid=problemid, problemtitle = problemtitle, submissionusername=get_username(userid = result["userid"]), submissiondate=result["submissiondate"], submissiontext=html.escape(result["submissiontext"]), submissionstatus=result["submissionstatus"], logged_in=logged_in(), username = get_username(), executiontime = executiontime, submissionid=submissionid, is_admin=is_admin())
 
+
+@app.route("/rejudge", methods=["GET"])
+def rejudge():
+    if not is_admin():
+        return abort(404)
+    submissionid = request.args["submissionid"]
+    db = get_db()
+    cur = db.execute("SELECT * FROM submissions WHERE submissionid = '" + submissionid + "'")
+    results = cur.fetchall()
+    if len(results) == 0:
+        return abort(404)
+    result = results[0]
+    delaygradesubmission(result["problemid"], submissionid, result["submissiontext"])
+    return redirect(url_for("submission", id=submissionid, _external=True, _scheme="https"))
 
 @app.route("/problems/<problemid>/losningsforslag", methods=["GET"])
 def solution(problemid):
