@@ -890,3 +890,6 @@ input:focus {
 }
 
 
+.problemtable .solutions {
+    width: 7.5em;
+}

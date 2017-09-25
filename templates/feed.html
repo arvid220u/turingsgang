@@ -17,10 +17,28 @@
                 {{ post['content'] | safe }}
 
             </div>
-            {% if post["hasproblems"] %}
+            {% if post["hasintroproblems"] %}
             <table class="realtable problemtable">
                 <tr class="tableheader">
                     <td>Inledande problem</td>
+                    {% if post["showintrosolutions"] %}
+                    <td class="solutions">Lösningsförslag</td>
+                    {% endif %}
+                </tr>
+                {% for problem in post["introproblems"] %}
+                <tr>
+                    <td class="{{ problem['status'] }}"><a href="{{ url_for('problem', problemid=problem['problemid'], _external=True, _scheme='https') }}">{{ problem['problemtitle'] }}</a></td>
+                    {% if post["showintrosolutions"] %}
+                    <td class="solutions"><a href="{{ url_for('solution', problemid=problem["problemid"]) }}">Lösningsförslag</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            {% if post["hasproblems"] %}
+            <table class="realtable problemtable">
+                <tr class="tableheader">
+                    <td>Problem</td>
                 </tr>
                 {% for problem in post["problems"] %}
                 <tr>
@@ -32,7 +50,7 @@
             {% if post["hasextraproblems"] %}
             <table class="realtable problemtable">
                 <tr class="tableheader">
-                    <td>Problem</td>
+                    <td>Extraproblem</td>
                 </tr>
                 {% for problem in post["extraproblems"] %}
                 <tr>

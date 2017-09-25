@@ -438,12 +438,20 @@ def rejudge():
 
 @app.route("/problems/<problemid>/losningsforslag", methods=["GET"])
 def solution(problemid):
-    if not logged_in():
-        return abort(404)
     #return render_template("submission.html")
     #return getsubmissionstatus(request.args["id"])
     solutionpath = rlpt("problems/" + problemid + "/solution.cpp")
     if not os.path.exists(solutionpath):
+        return abort(404)
+
+    publicsolution = False
+    publicpath = rlpt("problems/" + problemid + "/publicsolution.txt")
+    if os.path.exists(publicpath):
+        with open(publicpath) as publicfile:
+            if publicfile.read().startswith("YES"):
+                publicsolution = True
+
+    if not publicsolution and not logged_in():
         return abort(404)
 
     # check if solved
@@ -453,7 +461,7 @@ def solution(problemid):
     for submission in cur.fetchall():
         if submission["submissionstatus"] == "Accepted":
             hassolved = True
-    if not hassolved:
+    if not hassolved and not publicsolution:
         return abort(404)
     
     problemtitle = getproblemtitle(problemid)
@@ -1306,11 +1314,44 @@ def feed():
                         if problem["status"] != "Accepted":
                             problem["status"] = submission["submissionstatus"]
                 extraproblems.append(problem)
+        introproblempath = rlpt("blog/" + blogid + "/introductoryproblems.txt")
+        introproblems = []
+        hasintroproblems = True
+        if os.path.exists(introproblempath):
+            with open(introproblempath) as problemsfile:
+                for line in problemsfile.readlines():
+                    if line.startswith("NOINTRODUCTORYPROBLEMS"):
+                        hasintroproblems = False
+                        break
+                    problemid = line.strip("\n")
+                    problem = {}
+                    problem["problemid"] = problemid
+                    problem["problemtitle"] = getproblemtitle(problemid)
+                    problem["status"] = "Not Attempted"
+                    if logged_in():
+                        # get submission id, date, status
+                        db = get_db()
+                        cur = db.execute("SELECT * FROM submissions WHERE userid = '" + user_id() + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                        for submission in cur.fetchall():
+                            if problem["status"] != "Accepted":
+                                problem["status"] = submission["submissionstatus"]
+                    introproblems.append(problem)
+        showintroproblempath = rlpt("blog/" + blogid + "/showintroductoryproblems.txt")
+        showintrosolutions = False
+        if os.path.exists(showintroproblempath):
+            with open(showintroproblempath) as showfile:
+                if showfile.read().startswith("YES"):
+                    showintrosolutions = True
+
 
         post["problems"] = problems
         post["hasproblems"] = hasproblems and (len(problems) != 0)
         post["extraproblems"] = extraproblems
         post["hasextraproblems"] = hasextraproblems and (len(extraproblems) != 0)
+        post["introproblems"] = introproblems
+        post["hasintroproblems"] = hasintroproblems and (len(introproblems) != 0)
+        post["showintrosolutions"] = showintrosolutions
+
 
         # maybe add images to the problem statement
         blogstatement = addextradatatoblogpost(blogstatement, blogid)

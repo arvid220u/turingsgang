@@ -1,2 +1,2 @@
-helloworld
-twosum
+taltankmedlinntrivial
+taltankmedandreatrivial

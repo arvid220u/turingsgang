@@ -19,6 +19,10 @@ with open("blog/" + name + "/content.html", "w") as cf:
     cf.write("blogcontent")
 with open("blog/" + name + "/title.txt", "w") as cf:
     cf.write("blogtitle")
+with open("blog/" + name + "/showintroductoryproblems.txt", "w") as cf:
+    cf.write("NO")
+with open("blog/" + name + "/introductoryproblems.txt", "w") as cf:
+    cf.write("NOINTRODUCTORYPROBLEMS")
 with open("blog/" + name + "/problems.txt", "w") as cf:
     cf.write("NOPROBLEMS")
 with open("blog/" + name + "/extraproblems.txt", "w") as cf:
