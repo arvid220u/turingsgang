@@ -58,6 +58,29 @@
         </table>
     {% endfor %}
 
+    <h3>Alla submissions</h3>
+
+    <table class="realtable cpsubmissionstable">
+        <tr class="tableheader">
+            <td>Datum</td>
+            <td>Användare</td>
+            <td>Visa</td>
+            <td>Problem</td>
+            <td>Status</td>
+            <td>CPU</td>
+        </tr>
+        {% for sub in allsubmissions %}
+            <tr id="submissioninfodetails">
+                <td>{{ sub["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ sub["username"] }}</td>
+                <td class="submissionlink"><a href="{{ sub['submissionlink'] }}">View</a></td>
+                <td><a href="{{ url_for('problem', problemid=sub["problemid"]) }}">{{ sub["problemtitle"] }}</a></td>
+                <td class="submissionstatus {{ sub["submissionstatus"] }}">{{ sub["submissionstatus"] }}</td>
+                <td class="submissiontime">{{ sub["executiontime"] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
 </div>
 
 {% endblock %}

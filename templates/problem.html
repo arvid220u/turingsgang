@@ -81,7 +81,7 @@
             <table class="realtable submissions">
                 <tr class="tableheader">
                     <td>Datum</td>
-                    <td>Full submission</td>
+                    <td>Visa submission</td>
                     <td>Status</td>
                     <td>CPU</td>
                 </tr>
@@ -89,7 +89,7 @@
                     
                 <tr>
                     <td class="submissiondate">{{ submission["submissiondate"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    <td class="submissionlink"><a href="{{ submission['submissionlink'] }}">View submission</a></td>
+                    <td class="submissionlink"><a href="{{ submission['submissionlink'] }}">Visa submission</a></td>
                     <td class="submissionstatus {{ submission['submissionstatus'] }}">{{ submission["submissionstatus"] }}</td>
                     <td class="submissiontime">{{ submission["executiontime"] }}</td>
                 </tr>

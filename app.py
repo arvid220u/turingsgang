@@ -469,6 +469,8 @@ def solution(problemid):
 def getproblemtitle(problemid):
     problemtitlepath = rlpt("problems/" + problemid + "/title.txt")
     problemtitle = problemid
+    if not os.path.exists(problemtitlepath):
+        return "[Problem borttaget]"
     with open(problemtitlepath) as problemtitlefile:
         problemtitle = problemtitlefile.read()
     return problemtitle
@@ -1083,7 +1085,26 @@ def controlpanel():
     for assig in assignments:
         assig.pop("realdate", None)
 
-    return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers, assignments=assignments, allstudents=allstudents)
+    # all submissions ever
+    allsubscur = db.execute("SELECT * FROM submissions ORDER BY submissiondate DESC")
+    allsubs = allsubscur.fetchall()
+    realsubs = []
+    for sub in allsubs:
+        # replace user id by username
+        ssub = {}
+        ssub["username"] = get_username(sub["userid"])
+        ssub["problemtitle"] = getproblemtitle(sub["problemid"])
+        ssub["problemid"] = sub["problemid"]
+        ssub["executiontime"] = sub["executiontime"]
+        ssub["submissionstatus"] = sub["submissionstatus"]
+        ssub["submissiondate"] = sub["submissiondate"]
+        ssub["submissionlink"] = url_for("submission", id=sub["submissionid"], _external=True, _scheme="https")
+        realsubs.append(ssub)
+
+
+
+
+    return render_template("controlpanel.html", logged_in=logged_in(), username=get_username(), allusers=allusers, assignments=assignments, allstudents=allstudents, allsubmissions = realsubs)
 
 @app.route("/deleteuser", methods=["GET"])
 def deleteuser():
@@ -1187,7 +1208,7 @@ def userstats(userid):
     problemids = os.listdir(rlpt("problems"))
     problems = []
     for problemid in problemids:
-        if problemid.startswith("%"):
+        if problemid.startswith("0"):
             continue
         problem = {}
         problem["problemid"] = problemid
