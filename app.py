@@ -1080,12 +1080,40 @@ def controlpanel():
                             disstat = submission["submissionstatus"]
                     problem["studentstatus"][student["userid"]] = disstat
                 extraproblems.append(problem)
+        introproblempath = rlpt("blog/" + blogid + "/introductoryproblems.txt")
+        introproblems = []
+        hasintroproblems = True
+        if os.path.exists(introproblempath):
+            with open(introproblempath) as problemsfile:
+                for line in problemsfile.readlines():
+                    if line.startswith("NOPROBLEMS"):
+                        hasintroproblems = False
+                        break
+                    problemid = line.strip("\n")
+                    problem = {}
+                    problem["problemid"] = problemid
+                    problem["problemtitle"] = getproblemtitle(problemid)
+                    problem["studentstatus"] = {}
+                    for student in allstudents:
+                        # get submission id, date, status
+                        db = get_db()
+                        disstat = "Not Attempted"
+                        cur = db.execute("SELECT * FROM submissions WHERE userid = '" + student["userid"] + "' AND problemid = '" + problemid + "' ORDER BY submissiondate")
+                        for submission in cur.fetchall():
+                            if disstat != "Accepted":
+                                disstat = submission["submissionstatus"]
+                        problem["studentstatus"][student["userid"]] = disstat
+                    introproblems.append(problem)
+        else:
+            hasintroproblems = False
 
         post["problems"] = problems
         post["hasproblems"] = hasproblems and (len(problems) != 0)
         post["extraproblems"] = extraproblems
         post["hasextraproblems"] = hasextraproblems and (len(extraproblems) != 0)
-        if hasextraproblems or hasproblems:
+        post["introproblems"] = introproblems
+        post["hasintroproblems"] = hasintroproblems and (len(introproblems) != 0)
+        if hasextraproblems or hasproblems or hasintroproblems:
             assignments.append(post)
 
     # sort by date

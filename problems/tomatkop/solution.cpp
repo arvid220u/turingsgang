@@ -14,6 +14,7 @@ int main() {
 
     int totalkostnad = X * T;
 
+    // Vi vill kolla om totalkostnaden är mindre eller lika med hur mycket pengar Linn har (dvs K)
     if (totalkostnad <= K) {
         // Notera: skulle vi skriva ut "Ja!" eller "ja" skulle vi få fel svar (Wrong Answer).
         cout << "JA" << endl;

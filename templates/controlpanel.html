@@ -39,6 +39,14 @@
                 <td><a href="{{ url_for('userstats', userid=student['userid'], _external=True, _scheme='https') }}">{{ student['username'] }}</a></td>
                 {% endfor %}
             </tr>
+            {% for problem in assignment["introproblems"] %}
+            <tr>
+                <td><a href="{{ url_for("problem", problemid=problem["problemid"], _external=True, _scheme="https") }}">{{ problem["problemtitle"] }}</a></td>
+                {% for student in allstudents %}
+                <td class = "{{ problem["studentstatus"][student["userid"]] }}">{{ problem["studentstatus"][student["userid"]] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
             {% for problem in assignment["problems"] %}
             <tr>
                 <td><a href="{{ url_for("problem", problemid=problem["problemid"], _external=True, _scheme="https") }}">{{ problem["problemtitle"] }}</a></td>
