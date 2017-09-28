@@ -905,6 +905,10 @@ def compileandrun():
             popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             compileoutput, compileerror = popn.communicate()
         except Exception as exception:
+            popn.terminate()
+            popn.stdout.close()
+            popn.stderr.close()
+            popn.kill()
             pass
         compileoutput = compileoutput.decode("utf-8")
         compileerror = compileerror.decode("utf-8")
@@ -917,6 +921,10 @@ def compileandrun():
                 popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 compileoutput, compileerror = popn.communicate()
             except Exception as exception:
+                popn.terminate()
+                popn.stdout.close()
+                popn.stderr.close()
+                popn.kill()
                 pass
             compileoutput = compileoutput.decode("utf-8")
             compileerror = compileerror.decode("utf-8")
@@ -1414,6 +1422,13 @@ def feed():
 
 
 
+
+@app.route("/reset")
+def reset():
+    if not is_admin():
+        return abort(404)
+    # RESET gunicorn!
+    process = subprocess.call("./restart.sh", shell=True)
 
 
 
