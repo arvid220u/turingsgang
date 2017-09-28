@@ -614,12 +614,22 @@ def grade(problemid, submissionid, submissiontext):
     status = ""
 
     # compile the file to the exfile
-    # popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # compileoutput, compileerror = popn.communicate()
+    popn = subprocess.Popen(["g++", "-std=c++11", "-static", "-O2", "-o", exfilename, filename], stderr=subprocess.PIPE)
+    compileerror = ""
     try:
-        subprocess.call(["g++", "-std=c++11", "-static", "-O2", "-o", exfilename, filename])
+        compileoutput, compileerror = popn.communicate()
     except Exception as exception:
         status = "Compile Error"
+    compileerror = compileerror.decode("utf-8")
+    popn.terminate()
+    popn.stderr.close()
+    popn.kill()
+    if "internal compiler error" in compileerror:
+        db = connect_db()
+        db.execute("UPDATE submissions SET submissionstatus = '" + "Internal Compile Error" + "', executiontime = '" + str(-1) + "' WHERE submissionid = '" + submissionid + "'")
+        db.commit()
+        realreset()
+        return
     if not os.path.exists(exfilename):
         status = "Compile Error"
 
@@ -676,6 +686,7 @@ def grade(problemid, submissionid, submissiontext):
         os.remove(exfilename)
     except OSError:
         pass
+
 
     # write to the sqlite database
     db = connect_db()
@@ -901,8 +912,8 @@ def compileandrun():
     if compileddifferent:
         compileoutput = ""
         compileerror = ""
+        popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, compiledfilename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             compileoutput, compileerror = popn.communicate()
         except Exception as exception:
             popn.terminate()
@@ -917,8 +928,8 @@ def compileandrun():
         if "internal compiler error" in compileerror:
             print("RECOMPILING")
             # try to compile again, using the original filename
+            popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             try:
-                popn = subprocess.Popen(["g++", "-std=c++11", "-fsanitize=address,undefined", "-Wall", "-o", exfilename, filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 compileoutput, compileerror = popn.communicate()
             except Exception as exception:
                 popn.terminate()
@@ -928,6 +939,9 @@ def compileandrun():
                 pass
             compileoutput = compileoutput.decode("utf-8")
             compileerror = compileerror.decode("utf-8")
+            if "internal compiler error" in compileerror:
+                # restart gunicorn!!!
+                realreset()
 
 
         # remove all references to the filename
@@ -1427,10 +1441,21 @@ def feed():
 def reset():
     if not is_admin():
         return abort(404)
+    realreset()
+
+def realreset():
     # RESET gunicorn!
     process = subprocess.call("./restart.sh", shell=True)
 
 
+@app.before_first_request
+def before_first_request():
+    # find all submissions with internal compiler error and rejudge them
+    db = get_db()
+    cur = db.execute("SELECT submissionid FROM submissions WHERE submissionstatus = 'Internal Compile Error'")
+    for elem in cur.fetchall():
+        delaygradesubmission(elem["problemid"], elem["submissionid"], elem["submissiontext"])
+    
 
 if __name__ == "__main__":
     app.run()
