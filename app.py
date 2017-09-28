@@ -943,28 +943,45 @@ def compileandrun():
 
     # get the output
     output = ""
-    try:
-        with open(infilename, "rb") as infile:
-            starttime = time.time()
-            result = subprocess.run([os.path.abspath(exfilename)], stdin=infile, timeout=4, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    with open(infilename, "rb") as infile:
+        starttime = time.time()
+        #result = subprocess.run([os.path.abspath(exfilename)], stdin=infile, timeout=4, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen([os.path.abspath(exfilename)], stdin=infile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            outs, errs = process.communicate(timeout=4)
+            process.terminate()
+            process.stdout.close()
+            process.stderr.close()
+            process.kill()
             endtime = time.time()
             returndata["executiontime"] = "{:.2f}".format(endtime - starttime) + " s"
-            if result.stderr.decode("utf-8") != "":
-                returndata["runtimeerror"] = result.stderr.decode("utf-8").replace(compiledfilename, "").replace(exfilename, "").replace("=================================================================", "============================")
-            result.check_returncode()
-            output = result.stdout.decode("utf-8")
-    except subprocess.TimeoutExpired as timeoutexception:
-        os.remove(infilename)
-        returndata["success"] = False
-        returndata["timeout"] = True
-        returndata["executiontime"] = ">4.00 s"
-        return json.dumps(returndata)
-    except Exception as exception:
-        os.remove(infilename)
-        returndata["success"] = False
-        #returndata["compileerror"] = str(exception)
-        print(str(exception))
-        return json.dumps(returndata)
+            #if result.stderr.decode("utf-8") != "":
+            #    returndata["runtimeerror"] = result.stderr.decode("utf-8").replace(compiledfilename, "").replace(exfilename, "").replace("=================================================================", "============================")
+            if errs.decode("utf-8") != "":
+                returndata["runtimeerror"] = errs.decode("utf-8").replace(compiledfilename, "").replace(exfilename, "").replace("=================================================================", "============================")
+            #result.check_returncode()
+            #output = result.stdout.decode("utf-8")
+            output = outs.decode("utf-8")
+        except subprocess.TimeoutExpired as timeoutexception:
+            process.terminate()
+            process.stdout.close()
+            process.stderr.close()
+            process.kill()
+            os.remove(infilename)
+            returndata["success"] = False
+            returndata["timeout"] = True
+            returndata["executiontime"] = ">4.00 s"
+            return json.dumps(returndata)
+        except Exception as exception:
+            process.terminate()
+            process.stdout.close()
+            process.stderr.close()
+            process.kill()
+            os.remove(infilename)
+            returndata["success"] = False
+            #returndata["compileerror"] = str(exception)
+            print(str(exception))
+            return json.dumps(returndata)
 
     # remove temporary files
     os.remove(infilename)
