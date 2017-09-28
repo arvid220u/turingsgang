@@ -1086,7 +1086,7 @@ def controlpanel():
         if os.path.exists(introproblempath):
             with open(introproblempath) as problemsfile:
                 for line in problemsfile.readlines():
-                    if line.startswith("NOPROBLEMS"):
+                    if line.startswith("NOINTRODUCTORYPROBLEMS"):
                         hasintroproblems = False
                         break
                     problemid = line.strip("\n")
