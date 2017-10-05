@@ -1,0 +1,53 @@
+<div class="statementparagraph" id="problemmainstatement">
+<p>
+Ett vanligt magitrick går till på följande vis:
+</p>
+<p>
+Tänk på ett tal. Subtrahera 1 från talet du tänkte på. Multiplicera resultatet med 3 och lägg till 9. Dela svaret med 3. Addera 5. Subtrahera talet du tänkte på från början. Talet du har kvar är 7.
+</p>
+<p>
+Självklart är ingen verklig tankeläsning involverad. Om vi kallar det ursprungliga talet för $x$ får vi genom att utföra operationerna uttrycken
+</p>
+<p style="text-align: center;">
+$\begin{align}
+(x) - 1 &= x - 1 \\
+(x-1) * 3 &= 3x-3 \\
+(3x-3)+9 &= 3x+6 \\
+(3x+6)\, / \, 3 &= x+2 \\
+(x+2) + 5 &= x+7 \\
+(x+7)-x &= 7
+\end{align}$
+</p>
+<p>
+Alltså kommer vi alltid få talet 7 på slutet!
+</p>
+<p>
+Johan vill imponera på sina kompisar genom att utföra en liknande tankeläsning. Tyvärr är han inte så bra på matte, så han behöver hjälp att ta reda på om hans eget magitrick faktiskt fungerar.
+</p>
+
+</div>
+
+<h2 class="inputoutputtitle" id="inputtitle">Input</h2>
+
+<div class="statementparagraph" id="inputstatement">
+    <p>
+Den första raden innehåller ett heltal $N$ ($1 \leq N \leq 10$) - antalet operationer som magitricket består av.
+    </p>
+    <p>
+De nästa $N$ raderna beskriver varje operation med hjälp av två mellanslagsseparerade tecken. Det första tecknet kommer att vara ett av ‘+’, ‘-’, ‘*’ och ‘/’, och beskriver operationen som utförs. Det andra tecknet anger talet operationen utförs med, och kommer att vara antingen en siffra 0-9, eller ett ‘x’. I det senare fallet ska du utföra operationen med talet som man ursprungligen tänkte på i stället.
+    </p>
+    <p>
+Du kommer aldrig få kommandot "/ x" eller "/ 0".
+    </p>
+</div>
+
+<h2 class="inputoutputtitle" id="outputtitle">Output</h2>
+
+<div class="statementparagraph" id="outputstatement">
+    <p>
+    Om magitricket fungerar, d.v.s. om man alltid får samma tal i slutet oavsett vad man började med, och det talet dessutom är ett heltal, ska du skriva ut talet. I annat fall ska du skriva ut "Nej".
+    </p>
+    <p>
+    Observera att det enbart är sluttalet som måste vara ett heltal - tal som uppträder i uträkningen behöver inte vara det.
+    </p>
+</div>
