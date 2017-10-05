@@ -1448,13 +1448,6 @@ def realreset():
     process = subprocess.call("./restart.sh", shell=True)
 
 
-@app.before_first_request
-def before_first_request():
-    # find all submissions with internal compiler error and rejudge them
-    db = get_db()
-    cur = db.execute("SELECT submissionid FROM submissions WHERE submissionstatus = 'Internal Compile Error'")
-    for elem in cur.fetchall():
-        delaygradesubmission(elem["problemid"], elem["submissionid"], elem["submissiontext"])
     
 
 if __name__ == "__main__":
