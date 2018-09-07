@@ -56,7 +56,7 @@ def close_db(error):
 
 
 # redis queues
-app.config['REDIS_QUEUE_KEY'] = 'submissionsqueue'
+app.config['REDIS_QUEUE_KEY'] = 'xxsubmissionsqueue'
 from redis import Redis
 redis = Redis()
 
@@ -124,7 +124,6 @@ def login():
     if request.method == 'POST':
         email = request.form['email'].lower()
         passwordhash = md5(request.form["password"].encode("utf-8")).hexdigest()
-        print("passwordhash: " + passwordhash)
         db = get_db()
         cur = db.execute("SELECT * FROM users WHERE email = '" + email + "' AND passwordhash = '" + passwordhash + "'")
         curlist = cur.fetchall()
@@ -171,7 +170,6 @@ def signup():
         # get all necessary details
         username = request.form['anvandnamn']
         passwordhash = md5(request.form["password"].encode("utf-8")).hexdigest()
-        print("passwordhash: " + passwordhash)
         email = request.form['email'].lower()
         userid = binascii.b2a_hex(os.urandom(20)).decode("utf-8")
 
@@ -534,8 +532,6 @@ def submit():
     if request.method == "POST":
         problemid = request.form["problem"]
         submissiontext = request.form["submission"]
-        print(problemid)
-        print(submissiontext)
 
         db = get_db()
 

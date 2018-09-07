@@ -39,6 +39,8 @@ Redis is used for the judging queue.
 
 Use the `screen` command tool to manage Redis. We need two screens: (1) redis, and (2) redisdaemon. (1) runs the command `redis-server`, and (2) runs the command `./redisdaemon.py`.
 
+Important: `mkdir grading` for grading to work.
+
 ### Requirements
 
 Run `pip install -r requirements.txt` to install all necessary libraries.
